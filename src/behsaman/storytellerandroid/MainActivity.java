@@ -49,10 +49,11 @@ public class MainActivity extends ActionBarActivity{
 		params.put("username", "behrooz");
 		params.put("password", "Behrooz2");
 	    //Object instream = NetworkIO.doPost("https://192.168.0.101:8443/login.jsp", params);
-		new NetworkIO().execute(new PostRequest(params, "https://192.168.0.101:8443/login.jsp"));
+		//new NetworkIO().execute(new PostRequest(params, "https://192.168.0.101:8443/login.jsp"));
+		new NetworkIO().execute(new PostRequest(params, "https://www.noveldevelopments.com:8443/login.jsp"));
 		params = new HashMap<String, String>();
 		params.put("limit", "10");
-		new NetworkIO().execute(new PostRequest(params, "https://192.168.0.101:8443/GetStory"));
+		new NetworkIO().execute(new PostRequest(params, "https://www.noveldevelopments.com:8443/GetStory"));
 		
 	    
 	}
