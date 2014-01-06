@@ -1,0 +1,142 @@
+package behsaman.storytellerandroid;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
+
+import networking.MyHttpClient;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.View;
+import android.widget.EditText;
+
+public class MainActivity extends ActionBarActivity{
+	MyHttpClient client;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	/** Called when the user clicks the Send button */
+	public void signIn(View view) {
+		client = new MyHttpClient(getApplicationContext());
+		
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("username", "behrooz");
+		params.put("password", "Behrooz2");
+	    //Object instream = NetworkIO.doPost("https://192.168.0.101:8443/login.jsp", params);
+		new NetworkIO().execute(new PostRequest(params, "https://192.168.0.101:8443/login.jsp"));
+		params = new HashMap<String, String>();
+		params.put("limit", "10");
+		new NetworkIO().execute(new PostRequest(params, "https://192.168.0.101:8443/GetStory"));
+		
+	    
+	}
+	
+	public class PostRequest {
+		HashMap<String, String> params;
+		String url;
+		private PostRequest(HashMap<String, String> params, String url) {
+			super();
+			this.params = params;
+			this.url = url;
+		}
+	}
+	
+	public class NetworkIO extends AsyncTask<PostRequest,Integer,Object>{
+		
+		@Override
+		protected Object doInBackground(PostRequest... param) {
+			URL url;
+			try {
+			/*	url = new URL(param[0].url);
+		        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		        conn.setReadTimeout(10000 );
+		        conn.setConnectTimeout(15000 );
+		        conn.setRequestMethod("POST");
+		        conn.setDoInput(true);
+		        //Set Params
+		        for(String key:param[0].params.keySet())
+		        	conn.addRequestProperty(key, param[0].params.get(key));
+		        // Starts the query
+		        conn.connect();
+		        int response = conn.getResponseCode();
+		        if(response != 200)
+		        	return "Unsuccessfull! HTTP REQUEST:"+response;
+		        InputStream is = conn.getInputStream();
+		        return is;*/
+				HttpPost httpPost = new HttpPost(param[0].url);
+				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+				//Set Params
+		        for(String key:param[0].params.keySet())
+		        	nvps.add(new BasicNameValuePair(key, param[0].params.get(key)));
+				httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+				HttpResponse response1 = client.execute(httpPost);
+				HttpEntity entity = response1.getEntity();
+			    if (entity != null) {
+		        	InputStream instream = entity.getContent();
+		        	return instream;
+		        }
+		        else
+		        	return "Null entity";
+			} catch (Exception e) {
+				return "Error in Connecting:"+e.getMessage();
+			}
+		}
+		
+		@Override
+		protected void onProgressUpdate(Integer... progress) {
+	        
+	    }
+
+	    protected void onPostExecute(Object instream) {
+	    	EditText et = (EditText) findViewById(R.id.edit_message);
+	    	if(instream instanceof String)
+		    {
+		    	et.setText((String)instream);
+		    	return;
+		    }
+		    
+		    String text = "";
+		    Scanner s = new Scanner((InputStream)instream);
+	        try {
+	           while(s.hasNext())
+	           {
+	        	   text+=s.nextLine();
+	           }
+	        }
+	        catch(Exception e) {
+	        	e.printStackTrace();
+	        }
+	        finally {
+	        	s.close();
+	        }
+		    et.setText(text);
+	    }
+
+	}
+}

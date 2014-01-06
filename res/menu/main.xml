@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" 
+      xmlns:StorytellerAndroid="http://schemas.android.com/apk/res-auto" >
+	
+    <!-- New Story, should appear as action button -->
+    <item android:id="@+id/action_new_story"
+          android:icon="@drawable/ic_status"
+          android:title="@string/action_new_story"
+          StorytellerAndroid:showAsAction="ifRoom" />
+    
+     <!-- Search, should appear as action button -->
+    <item android:id="@+id/action_search"
+          android:icon="@drawable/ic_action_search"
+          android:title="@string/action_search"
+          StorytellerAndroid:showAsAction="ifRoom" />
+    
+    
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+
+</menu>
