@@ -8,6 +8,8 @@
     <string name="action_search">Search</string>
     <string name="action_new_story">New Story</string>
     <string name="action_profile">My Stories</string>
-    
+    <string name="title_activity_newfeed">NewfeedActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_customized_list_view">CustomizedListView</string>
 
 </resources>
