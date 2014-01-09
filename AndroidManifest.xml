@@ -20,11 +20,7 @@
         <activity
             android:name="behsaman.storytellerandroid.MainActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            
         </activity>
         <activity
             android:name="behsaman.storytellerandroid.NewfeedActivity"
@@ -33,6 +29,19 @@
         <activity
             android:name="behsaman.storytellerandroid.CustomizedListView"
             android:label="@string/title_activity_customized_list_view" >
+        </activity>
+        <activity
+            android:name="behsaman.storytellerandroid.LoginActivity"
+            android:label="@string/title_activity_login" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="behsaman.storytellerandroid.RegisterActivity"
+            android:label="@string/title_activity_register" >
         </activity>
     </application>
 

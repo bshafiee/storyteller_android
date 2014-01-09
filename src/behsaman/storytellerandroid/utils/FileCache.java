@@ -1,4 +1,4 @@
-package behsaman.storytellerandroid;
+package behsaman.storytellerandroid.utils;
 
 import java.io.File;
 import android.content.Context;

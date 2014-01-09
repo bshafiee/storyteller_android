@@ -1,4 +1,4 @@
-package behsaman.storytellerandroid;
+package behsaman.storytellerandroid.utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;

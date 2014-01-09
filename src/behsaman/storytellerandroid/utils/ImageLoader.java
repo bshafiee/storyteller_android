@@ -1,4 +1,4 @@
-package behsaman.storytellerandroid;
+package behsaman.storytellerandroid.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import behsaman.storytellerandroid.R;
+import behsaman.storytellerandroid.R.drawable;
 
 
 import android.app.Activity;

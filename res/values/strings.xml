@@ -11,5 +11,7 @@
     <string name="title_activity_newfeed">NewfeedActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_customized_list_view">CustomizedListView</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
 
 </resources>

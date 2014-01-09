@@ -1,4 +1,4 @@
-package behsaman.storytellerandroid;
+package behsaman.storytellerandroid.utils;
 
 import java.io.IOException;
 import java.io.StringReader;

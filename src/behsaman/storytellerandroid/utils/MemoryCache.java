@@ -1,4 +1,4 @@
-package behsaman.storytellerandroid;
+package behsaman.storytellerandroid.utils;
 
 import java.lang.ref.SoftReference;
 import java.util.Collections;

@@ -13,20 +13,24 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import behsaman.storytellerandroid.networking.MyHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
+import behsaman.storytellerandroid.networking.MyHttpClient;
+import behsaman.storytellerandroid.networking.ServerIO;
 
 public class MainActivity extends ActionBarActivity{
 	MyHttpClient client;
@@ -52,7 +56,7 @@ public class MainActivity extends ActionBarActivity{
 	
 	/** Called when the user clicks the Send button */
 	public void signIn(View view) {
-		client = new MyHttpClient(getApplicationContext());
+		/*client = new MyHttpClient(getApplicationContext());
 		
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("username", "behrooz");
@@ -62,9 +66,19 @@ public class MainActivity extends ActionBarActivity{
 		new NetworkIO().execute(new PostRequest(params, "https://www.noveldevelopments.com:8443/login.jsp"));
 		params = new HashMap<String, String>();
 		params.put("limit", "10");
-		new NetworkIO().execute(new PostRequest(params, "https://www.noveldevelopments.com:8443/GetStory"));
+		new NetworkIO().execute(new PostRequest(params, "https://www.noveldevelopments.com:8443/GetStory"));*/
 		
-	    
+		final EditText et = (EditText) findViewById(R.id.edit_message);
+
+		
+		RequestParams params = new RequestParams();
+		params.add("limit", "100");
+		ServerIO.getInstance().post(ServerIO.GET_STORY_URL, params, new JsonHttpResponseHandler() {
+			@Override
+            public synchronized void onSuccess(JSONArray arr) {
+				et.setText(arr.toString());
+            }
+		});
 	}
 	
 	public class PostRequest {

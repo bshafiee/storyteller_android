@@ -7,6 +7,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import behsaman.storytellerandroid.utils.XMLParser;
+
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;

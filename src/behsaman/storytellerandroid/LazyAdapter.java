@@ -3,6 +3,11 @@ package behsaman.storytellerandroid;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import behsaman.storytellerandroid.R;
+import behsaman.storytellerandroid.R.id;
+import behsaman.storytellerandroid.R.layout;
+import behsaman.storytellerandroid.utils.ImageLoader;
+
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
