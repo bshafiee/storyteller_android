@@ -1,4 +1,4 @@
-package networking;
+package behsaman.storytellerandroid.networking;
 
 import android.content.Context;
 import behsaman.storytellerandroid.R;

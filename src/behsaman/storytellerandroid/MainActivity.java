@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-import networking.MyHttpClient;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -16,6 +14,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 
+import behsaman.storytellerandroid.networking.MyHttpClient;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
