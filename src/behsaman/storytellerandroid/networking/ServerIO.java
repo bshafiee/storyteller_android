@@ -4,10 +4,8 @@ import java.io.InputStream;
 import java.security.KeyStore;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.content.Context;
 import android.util.Log;
 import behsaman.storytellerandroid.R;
@@ -75,6 +73,7 @@ public class ServerIO {
 		RequestParams params = new RequestParams();
 		params.add("username", user);
 		params.add("password", pass);
+		params.add("rememberMe", "true");
 		post(ServerIO.LOGIN_URL, params, new JsonHttpResponseHandler() {
 			@Override
             public synchronized void onSuccess(JSONObject obj) {

@@ -13,5 +13,6 @@
     <string name="title_activity_customized_list_view">CustomizedListView</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_new_story">NewStoryActivity</string>
 
 </resources>

@@ -3,10 +3,11 @@ package behsaman.storytellerandroid.datamodel;
 import java.util.Date;
 
 public class StoryModel {
+	public static final String DATE_FORMAT = "MMM dd, yyyy"; 
 	//Fields
 	private Integer id;
-	private UserModel owner;
-	private CategoryModel category;
+	private Integer owner;
+	private Integer category;
 	private String title;
 	private MAX_NUM_PIECES_TYPE max_num_pieces;
 	private MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length;
@@ -17,7 +18,7 @@ public class StoryModel {
 	
 	public StoryModel() {this.reset();}
 	
-	public StoryModel(Integer id, UserModel owner_id, CategoryModel category_id, String title,
+	public StoryModel(Integer id, Integer owner_id, Integer category_id, String title,
 			MAX_NUM_PIECES_TYPE max_num_pieces,
 			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length,
 			MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length,
@@ -36,7 +37,7 @@ public class StoryModel {
 		this.created_on = created_on;
 	}
 
-	public StoryModel(UserModel owner_id, CategoryModel category_id, String title,
+	public StoryModel(Integer owner_id, Integer category_id, String title,
 			MAX_NUM_PIECES_TYPE max_num_pieces,
 			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length,
 			MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length,
@@ -74,19 +75,19 @@ public class StoryModel {
 		this.id = id;
 	}
 
-	public UserModel getOwner_id() {
+	public Integer getOwner_id() {
 		return owner;
 	}
 
-	public void setOwner_id(UserModel owner_id) {
+	public void setOwner_id(Integer owner_id) {
 		this.owner = owner_id;
 	}
 
-	public CategoryModel getCategory_id() {
+	public Integer getCategory_id() {
 		return category;
 	}
 
-	public void setCategory_id(CategoryModel category_id) {
+	public void setCategory_id(Integer category_id) {
 		this.category = category_id;
 	}
 

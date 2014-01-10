@@ -15,22 +15,21 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.widget.EditText;
 import behsaman.storytellerandroid.networking.MyHttpClient;
 import behsaman.storytellerandroid.networking.ServerIO;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 public class MainActivity extends ActionBarActivity{
 	MyHttpClient client;
@@ -45,11 +44,28 @@ public class MainActivity extends ActionBarActivity{
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		
+		MenuItem item = (MenuItem) findViewById(R.id.action_new_story);
+		item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				changeViewToCreateNewStory();
+				return false;
+			}
+		});
+		
 		return true;
 	}
 	
+	public void changeViewToCreateNewStory() {
+		Intent intent = new Intent(this, NewsfeedActivity.class);
+		startActivity(intent);
+		
+	}
+	
 	public void changeView(View view) {
-		Intent intent = new Intent(this, CustomizedListView.class);
+		Intent intent = new Intent(this, NewsfeedActivity.class);
 		startActivity(intent);
 		
 	}
@@ -76,7 +92,12 @@ public class MainActivity extends ActionBarActivity{
 		ServerIO.getInstance().post(ServerIO.GET_STORY_URL, params, new JsonHttpResponseHandler() {
 			@Override
             public synchronized void onSuccess(JSONArray arr) {
-				et.setText(arr.toString());
+				try {
+					et.setText(arr.getJSONObject(0).toString());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
 		});
 	}

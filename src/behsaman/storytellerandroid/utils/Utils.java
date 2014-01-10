@@ -2,8 +2,15 @@ package behsaman.storytellerandroid.utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.util.Log;
 
 public class Utils {
+	private static final String TAG = "Utils";
+	
     public static void CopyStream(InputStream is, OutputStream os)
     {
         final int buffer_size=1024;
@@ -19,5 +26,15 @@ public class Utils {
             }
         }
         catch(Exception ex){}
+    }
+    
+    public static Date parseDate(String pattern, String input)
+    {
+    	try {
+			return new SimpleDateFormat(pattern).parse(input);
+		} catch (ParseException e) {
+			Log.e(TAG, "Error in parsing input date. Input:"+input+"\tPattern:"+pattern+"\t"+e.getMessage());
+			return null;
+		}
     }
 }
