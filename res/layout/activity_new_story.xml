@@ -25,7 +25,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/header"
             android:orientation="vertical"
-            android:padding="10dip" >
+            android:padding="10dip"
+            android:gravity="center" >
 
             <!-- Title Label -->
 
@@ -51,7 +52,7 @@
                 android:textColor="#372c24" />
 
             <Spinner
-                android:id="@+id/db_new_story_category"
+                android:id="@+id/spinner_new_story_category"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dip"
@@ -75,7 +76,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:onClick="onRadioButtonClicked"
                     android:text="Short(100)"
                     android:textSize="12sp" />
 
@@ -83,7 +83,6 @@
                     android:id="@+id/radio_new_story_num_piece_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
                     android:text="Medium(500)"
                     android:textSize="12sp" />
 
@@ -91,7 +90,6 @@
                     android:id="@+id/radio_new_story_num_piece_long"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
                     android:text="Long(1000)"
                     android:textSize="12sp" />
             </RadioGroup>
@@ -114,7 +112,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:onClick="onRadioButtonClicked"
                     android:text="Short"
                      />
 
@@ -122,7 +119,6 @@
                     android:id="@+id/radio_new_story_num_piece_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
                     android:text="Medium"
                      />
 
@@ -130,34 +126,63 @@
                     android:id="@+id/radio_new_story_num_piece_long"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
                     android:text="Long"
                      />
             </RadioGroup>
-            <!-- Password Label -->
-
+ 			<!-- Number of Pieces Label -->
             <TextView
+                android:id="@+id/tv_new_story_lock_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Password"
+                android:text="Lock time"
                 android:textColor="#372c24" />
 
-            <EditText
-                android:id="@+id/reg_password"
+            <RadioGroup
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
-                android:password="true"
-                android:singleLine="true" />
-            <!-- Register Button -->
+                android:orientation="vertical" >
 
+                <RadioButton
+                    android:id="@+id/radio_new_story_lock_time_quick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Quick (5 min)"
+                     />
+
+                <RadioButton
+                    android:id="@+id/radio_new_story_lock_time_fast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fast (10 min)"
+                     />
+
+                <RadioButton
+                    android:id="@+id/radio_new_story_lock_time_moderate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Moderate (30 min)"
+                     />
+                <RadioButton
+                    android:id="@+id/radio_new_story_lock_time_long"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Long (1 hour)"
+                     />
+                <RadioButton
+                    android:id="@+id/radio_new_story_lock_time_very_long"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Very Long (1 day)"
+                     />
+            </RadioGroup>            
+            
             <Button
-                android:id="@+id/btnRegister"
-                android:layout_width="fill_parent"
+                android:id="@+id/btn_new_story"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
-                android:text="Register New Account" />
-            <!-- Link to Login Screen -->
+                android:text="Add Story" />
 
         </LinearLayout>
         <!-- Registration Form Ends -->

@@ -1,7 +1,7 @@
 package behsaman.storytellerandroid.datamodel;
 
 public enum LOCK_TIME_MINS {
-	QUICK(1), FAST(5), MODERATE(10), LONG(60), VERY_LONG(60*24); 
+	QUICK(5), FAST(10), MODERATE(30), LONG(60), VERY_LONG(60*24); 
     private int val;
     LOCK_TIME_MINS (int numVal) {
         this.val = numVal;
