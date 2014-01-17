@@ -7,7 +7,7 @@ public enum LOCK_TIME_MINS {
         this.val = numVal;
     }
    
-    public int getNumVal() {
+    public Integer getNumVal() {
         return val;
     }
 

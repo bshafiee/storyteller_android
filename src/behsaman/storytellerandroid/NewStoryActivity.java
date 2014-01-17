@@ -13,12 +13,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.Toast;
-import behsaman.storytellerandroid.datamodel.CategoryModel;
+import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
 import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_TEXT_PIECE_LENGTH_TYPE;
@@ -152,6 +150,64 @@ public class NewStoryActivity extends Activity {
 			}
 			newStory.setMax_multimedia_piece_length(multimedia_piece_length);
 		}
+		
+		LOCK_TIME_MINS lockTime = null;
+		switch(lockTimeRadioGroup.getCheckedRadioButtonId())
+		{
+			case R.id.radio_new_story_lock_time_quick:
+				lockTime = LOCK_TIME_MINS.QUICK;
+				break;
+			case R.id.radio_new_story_lock_time_fast:
+				lockTime = LOCK_TIME_MINS.FAST;
+				break;
+			case R.id.radio_new_story_lock_time_moderate:
+				lockTime = LOCK_TIME_MINS.MODERATE;
+				break;
+			case R.id.radio_new_story_lock_time_long:
+				lockTime = LOCK_TIME_MINS.LONG;
+				break;
+			case R.id.radio_new_story_lock_time_very_long:
+				lockTime = LOCK_TIME_MINS.VERY_LONG;
+				break;
+		}
+		newStory.setLock_time_mins(lockTime);
+		newStory.setMax_num_pieces(numPiece);
+		
+		validateAndSendStory(newStory);
 	}
-
+	
+	private void validateAndSendStory(StoryModel newStory)
+	{
+		if(!ServerIO.getInstance().isLoggedIn())
+		{
+			Log.e(TAG,"FatalError: You can't add a new story while you're not logged in");
+			return;
+		}
+		
+		RequestParams params = new RequestParams();
+		params.add("category", newStory.getCategory());
+		params.add("title", newStory.getTitle());
+		params.add("max_num_pieces", newStory.getMax_num_pieces().getNumVal().toString());
+		params.add("max_multimedia_piece_length", newStory.getMax_multimedia_piece_length().getNumVal().toString());
+		params.add("max_text_piece_length", newStory.getMax_text_piece_length().toString());
+		params.add("lock_time_mins", newStory.getLock_time_mins().getNumVal().toString());
+		ServerIO.getInstance().post(ServerIO.INSERT_STORY_URL, params, new JsonHttpResponseHandler() {
+			@Override
+            public synchronized void onSuccess(JSONObject obj) {
+				try {
+					if(obj.getString("status").equals("Successful"))
+					{
+						///yayay
+					}
+					else
+					{
+						//nono
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+            }
+		});
+	}
 }

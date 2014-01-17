@@ -8,7 +8,7 @@ public enum MAX_MULTIMEDIA_PIECE_LENGTH_TYPE {
         this.val = numVal;
     }
    
-    public int getNumVal() {
+    public Integer getNumVal() {
         return val;
     }
 

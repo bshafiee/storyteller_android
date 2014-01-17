@@ -8,7 +8,7 @@ public enum MAX_NUM_PIECES_TYPE {
         this.val = numVal;
     }
     
-    public int getNumVal() {
+    public Integer getNumVal() {
         return val;
     }
     
