@@ -11,8 +11,19 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
+import behsaman.storytellerandroid.datamodel.CategoryModel;
+import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
+import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
+import behsaman.storytellerandroid.datamodel.MAX_TEXT_PIECE_LENGTH_TYPE;
+import behsaman.storytellerandroid.datamodel.STORY_TYPE;
+import behsaman.storytellerandroid.datamodel.StoryModel;
 import behsaman.storytellerandroid.networking.ServerIO;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -61,6 +72,86 @@ public class NewStoryActivity extends Activity {
 				s.setAdapter(dataAdapter);
             }
 		});
+	}
+	
+	public void addStoryHandler(View v)
+	{
+		EditText titleBox = (EditText)findViewById(R.id.et_new_story_title);
+		Spinner categorySpinner = (Spinner)findViewById(R.id.spinner_new_story_category);
+		RadioGroup numPiecesRadioGroup = (RadioGroup) findViewById(R.id.radiogroup_new_story_num_pieces);
+		RadioGroup pieceLengthRadioGroup = (RadioGroup) findViewById(R.id.radiogroup_new_story_piece_length);
+		RadioGroup lockTimeRadioGroup = (RadioGroup) findViewById(R.id.radiogroup_new_story_lock_time);
+		RadioGroup storyTypeRadioGroup = (RadioGroup) findViewById(R.id.radiogroup_new_story_story_type);
+		//Create a new Story Model
+		StoryModel newStory = new StoryModel();
+		newStory.setTitle(titleBox.getText().toString());
+		newStory.setCategory(categorySpinner.getSelectedItem().toString());
+		
+		STORY_TYPE storyType = null;
+		switch(storyTypeRadioGroup.getCheckedRadioButtonId())
+		{
+			case R.id.radio_new_story_type_text:
+				storyType = STORY_TYPE.TEXT_ONLY;
+				break;
+			case R.id.radio_new_story_type_text_pic:
+				storyType = STORY_TYPE.COMICS;
+				break;
+			case R.id.radio_new_story_type_audio:
+				storyType = STORY_TYPE.AUDIO;
+				break;
+			case R.id.radio_new_story_type_video:
+				storyType = STORY_TYPE.VIDEO;
+				break;
+		}
+		
+		MAX_NUM_PIECES_TYPE numPiece = null;
+		switch(numPiecesRadioGroup.getCheckedRadioButtonId())
+		{
+			case R.id.radio_new_story_num_piece_short:
+				numPiece = MAX_NUM_PIECES_TYPE.SHORT;
+				break;
+			case R.id.radio_new_story_num_piece_medium:
+				numPiece = MAX_NUM_PIECES_TYPE.MEDIUM;
+				break;
+			case R.id.radio_new_story_num_piece_long:
+				numPiece = MAX_NUM_PIECES_TYPE.LONG;
+				break;
+		}
+
+		if(storyType==STORY_TYPE.TEXT_ONLY||storyType==STORY_TYPE.COMICS)
+		{
+			MAX_TEXT_PIECE_LENGTH_TYPE text_piece_length = null;
+			switch(pieceLengthRadioGroup.getCheckedRadioButtonId())
+			{
+				case R.id.radio_new_story_num_piece_short:
+					text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.SHORT;
+					break;
+				case R.id.radio_new_story_num_piece_medium:
+					text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.MEDIUM;
+					break;
+				case R.id.radio_new_story_num_piece_long:
+					text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.LONG;
+					break;
+			}
+			newStory.setMax_text_piece_length(text_piece_length);
+		}
+		else
+		{
+			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE multimedia_piece_length = null;
+			switch(pieceLengthRadioGroup.getCheckedRadioButtonId())
+			{
+				case R.id.radio_new_story_num_piece_short:
+					multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.SHORT;
+					break;
+				case R.id.radio_new_story_num_piece_medium:
+					multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.MEDIUM;
+					break;
+				case R.id.radio_new_story_num_piece_long:
+					multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.LONG;
+					break;
+			}
+			newStory.setMax_multimedia_piece_length(multimedia_piece_length);
+		}
 	}
 
 }

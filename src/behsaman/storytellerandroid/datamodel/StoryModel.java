@@ -7,7 +7,7 @@ public class StoryModel {
 	//Fields
 	private Integer id;
 	private Integer owner;
-	private Integer category;
+	private String category;
 	private String title;
 	private MAX_NUM_PIECES_TYPE max_num_pieces;
 	private MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length;
@@ -18,7 +18,7 @@ public class StoryModel {
 	
 	public StoryModel() {this.reset();}
 	
-	public StoryModel(Integer id, Integer owner_id, Integer category_id, String title,
+	public StoryModel(Integer id, Integer owner_id, String category, String title,
 			MAX_NUM_PIECES_TYPE max_num_pieces,
 			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length,
 			MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length,
@@ -27,7 +27,7 @@ public class StoryModel {
 		super();
 		this.id = id;
 		this.owner = owner_id;
-		this.category = category_id;
+		this.category = category;
 		this.title = title;
 		this.max_num_pieces = max_num_pieces;
 		this.max_multimedia_piece_length = max_multimedia_piece_length;
@@ -37,7 +37,7 @@ public class StoryModel {
 		this.created_on = created_on;
 	}
 
-	public StoryModel(Integer owner_id, Integer category_id, String title,
+	public StoryModel(Integer owner_id, String category, String title,
 			MAX_NUM_PIECES_TYPE max_num_pieces,
 			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length,
 			MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length,
@@ -45,7 +45,7 @@ public class StoryModel {
 		super();
 		this.reset();
 		this.owner = owner_id;
-		this.category = category_id;
+		this.category = category;
 		this.title = title;
 		this.max_num_pieces = max_num_pieces;
 		this.max_multimedia_piece_length = max_multimedia_piece_length;
@@ -83,12 +83,12 @@ public class StoryModel {
 		this.owner = owner_id;
 	}
 
-	public Integer getCategory_id() {
+	public String getCategory() {
 		return category;
 	}
 
-	public void setCategory_id(Integer category_id) {
-		this.category = category_id;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public String getTitle() {

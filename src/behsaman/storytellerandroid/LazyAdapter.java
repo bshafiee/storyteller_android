@@ -54,7 +54,7 @@ public class LazyAdapter extends BaseAdapter {
         
         // Setting all values in listview
         title.setText(story.getTitle());
-        String description = "Category: "+story.getCategory_id();
+        String description = "Category: "+story.getCategory();
         description += "\t\tCreated By: "+story.getOwner_id();
         description += "\nPieces Left: "+(story.getMax_num_pieces().getNumVal() - story.getNext_available_piece());
         

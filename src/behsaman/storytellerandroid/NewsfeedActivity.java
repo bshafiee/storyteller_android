@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,7 +51,7 @@ public class NewsfeedActivity extends Activity {
 						JSONObject obj = (JSONObject) arr.get(i);
 						int id = obj.getInt("id");
 						int owner_id = obj.getInt("owner_id");
-						int category_id = obj.getInt("category_id");
+						Integer category_id = obj.getInt("category_id");
 						String title = obj.getString("title");
 						MAX_NUM_PIECES_TYPE max_num_pieces = MAX_NUM_PIECES_TYPE.valueOf(obj.getString("max_num_pieces"));
 						MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length = 
@@ -60,7 +61,7 @@ public class NewsfeedActivity extends Activity {
 						int next_available_piece = obj.getInt("next_available_piece");
 						Date created_on = Utils.parseDate(StoryModel.DATE_FORMAT, obj.getString("created_on"));
 						
-						StoryModel story = new StoryModel(id, owner_id, category_id, title, max_num_pieces, max_multimedia_piece_length, 
+						StoryModel story = new StoryModel(id, owner_id, category_id.toString(), title, max_num_pieces, max_multimedia_piece_length, 
 												max_text_piece_length, lock_time_mins, next_available_piece, created_on);
 						stories.add(story);
 						

@@ -58,6 +58,44 @@
                 android:layout_marginBottom="20dip"
                 android:layout_marginTop="5dip"
                 android:singleLine="true" />
+            
+            <!-- Story Type -->
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Story Type"
+                android:textColor="#372c24" />
+
+            <RadioGroup
+                android:id="@+id/radiogroup_new_story_story_type"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <RadioButton
+                    android:id="@+id/radio_new_story_type_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Text Only" />
+
+                <RadioButton
+                    android:id="@+id/radio_new_story_type_text_pic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Text and Picture (Comics)" />
+
+                <RadioButton
+                    android:id="@+id/radio_new_story_type_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Audio" />
+                <RadioButton
+                    android:id="@+id/radio_new_story_type_video"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Video" />
+            </RadioGroup>
 
             <!-- Number of Pieces Label -->
             <TextView
@@ -67,31 +105,29 @@
                 android:textColor="#372c24" />
 
             <RadioGroup
+                android:id="@+id/radiogroup_new_story_num_pieces"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="vertical" >
 
                 <RadioButton
                     android:id="@+id/radio_new_story_num_piece_short"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Short(100)"
-                    android:textSize="12sp" />
+                    android:text="Short(100)" />
 
                 <RadioButton
                     android:id="@+id/radio_new_story_num_piece_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Medium(500)"
-                    android:textSize="12sp" />
+                    android:text="Medium(500)" />
 
                 <RadioButton
                     android:id="@+id/radio_new_story_num_piece_long"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Long(1000)"
-                    android:textSize="12sp" />
+                    android:text="Long(1000)" />
             </RadioGroup>
             
             <!-- Number of Pieces Label -->
@@ -103,9 +139,10 @@
                 android:textColor="#372c24" />
 
             <RadioGroup
+                android:id="@+id/radiogroup_new_story_piece_length"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="vertical" >
 
                 <RadioButton
                     android:id="@+id/radio_new_story_num_piece_short"
@@ -138,6 +175,7 @@
                 android:textColor="#372c24" />
 
             <RadioGroup
+                android:id="@+id/radiogroup_new_story_lock_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
@@ -182,7 +220,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
-                android:text="Add Story" />
+                android:text="Add Story" 
+                android:onClick="addStoryHandler"/>
 
         </LinearLayout>
         <!-- Registration Form Ends -->
