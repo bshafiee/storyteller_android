@@ -1,14 +1,14 @@
 package behsaman.storytellerandroid.datamodel;
 
 public enum MAX_TEXT_PIECE_LENGTH_TYPE {
-	SHORT(100),MEDIUM(500),LONG(1000);
+	SHORT(100),MEDIUM(500),LONG(1000),ZERO(0);
 	
-    private int val;
+    private int val = 0;
     MAX_TEXT_PIECE_LENGTH_TYPE (int numVal) {
         this.val = numVal;
     }
    
-    public int getNumVal() {
+    public Integer getNumVal() {
         return val;
     }
 

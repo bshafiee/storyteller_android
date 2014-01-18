@@ -14,11 +14,11 @@ public enum LOCK_TIME_MINS {
 	public static LOCK_TIME_MINS valueOf(int v) {
 		switch (v)
     	{
-			case 1:
-				return QUICK;
 			case 5:
-				return FAST;
+				return QUICK;
 			case 10:
+				return FAST;
+			case 30:
 				return MODERATE;
 			case 60:
 				return LONG;

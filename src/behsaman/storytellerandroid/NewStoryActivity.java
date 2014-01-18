@@ -8,14 +8,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
 import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
@@ -132,6 +137,7 @@ public class NewStoryActivity extends Activity {
 					break;
 			}
 			newStory.setMax_text_piece_length(text_piece_length);
+			newStory.setMax_multimedia_piece_length(MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.ZERO);
 		}
 		else
 		{
@@ -149,6 +155,7 @@ public class NewStoryActivity extends Activity {
 					break;
 			}
 			newStory.setMax_multimedia_piece_length(multimedia_piece_length);
+			newStory.setMax_text_piece_length(MAX_TEXT_PIECE_LENGTH_TYPE.ZERO);
 		}
 		
 		LOCK_TIME_MINS lockTime = null;
@@ -189,19 +196,29 @@ public class NewStoryActivity extends Activity {
 		params.add("title", newStory.getTitle());
 		params.add("max_num_pieces", newStory.getMax_num_pieces().getNumVal().toString());
 		params.add("max_multimedia_piece_length", newStory.getMax_multimedia_piece_length().getNumVal().toString());
-		params.add("max_text_piece_length", newStory.getMax_text_piece_length().toString());
+		params.add("max_text_piece_length", newStory.getMax_text_piece_length().getNumVal().toString());
 		params.add("lock_time_mins", newStory.getLock_time_mins().getNumVal().toString());
+		
+		//Create ProgressBar
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setMessage("Adding your story...");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setIndeterminate(true);
+		
+        progress.show();
 		ServerIO.getInstance().post(ServerIO.INSERT_STORY_URL, params, new JsonHttpResponseHandler() {
 			@Override
             public synchronized void onSuccess(JSONObject obj) {
+				progress.dismiss();
 				try {
 					if(obj.getString("status").equals("Successful"))
 					{
-						///yayay
+						changeViewToFeedActivity();
 					}
 					else
 					{
-						//nono
+						showFailureToast();
+						Log.e(TAG, "Error in adding Story:"+obj.toString());
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -209,5 +226,34 @@ public class NewStoryActivity extends Activity {
 				
             }
 		});
+	}
+	
+	public void showSuccessToast()
+	{
+		Context context = this;
+		CharSequence text = "Your story was added successfully!";
+		int duration = Toast.LENGTH_LONG;
+
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.setGravity(Gravity.CENTER, 0,0);
+		toast.show();
+	}
+	
+	public void showFailureToast()
+	{
+		Context context = this;
+		CharSequence text = "Sorry, an error occured while adding your story :(";
+		int duration = Toast.LENGTH_LONG;
+
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.setGravity(Gravity.CENTER, 0,0);
+		toast.show();
+	}
+	
+	
+	private void changeViewToFeedActivity() {
+		Intent intent = new Intent(this, NewsfeedActivity.class);
+		startActivity(intent);
+		
 	}
 }

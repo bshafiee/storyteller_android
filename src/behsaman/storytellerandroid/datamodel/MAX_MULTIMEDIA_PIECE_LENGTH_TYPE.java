@@ -1,7 +1,7 @@
 package behsaman.storytellerandroid.datamodel;
 
 public enum MAX_MULTIMEDIA_PIECE_LENGTH_TYPE {
-	SHORT(100),MEDIUM(500),LONG(1000);
+	SHORT(100),MEDIUM(500),LONG(1000),ZERO(0);
 	
     private int val;
     MAX_MULTIMEDIA_PIECE_LENGTH_TYPE (int numVal) {
