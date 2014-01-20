@@ -88,6 +88,7 @@ public class NewsfeedActivity extends Activity {
             }
 		});
 	}	
+	
 	/*
 public class XMLFetcher extends AsyncTask<Activity,Integer,Object>{
 		Activity parentActivity = null;
