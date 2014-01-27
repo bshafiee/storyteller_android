@@ -50,6 +50,10 @@
             android:name="behsaman.storytellerandroid.TextPieceActivity"
             android:label="@string/title_activity_text_piece" >
         </activity>
+        <activity
+            android:name="behsaman.storytellerandroid.StoryPageActivity"
+            android:label="@string/title_activity_story_page" >
+        </activity>
     </application>
 
 </manifest>

@@ -57,6 +57,7 @@ public class LazyAdapter extends BaseAdapter {
         String description = "Category: "+story.getCategory();
         description += "\t\tCreated By: "+story.getOwner_id();
         description += "\nPieces Left: "+(story.getMax_num_pieces().getNumVal() - story.getNext_available_piece());
+        description += "\nStory Type: "+(story.getType());
         
         story_desc.setText(description);
         creation_date.setText(DateFormat.format(StoryModel.DATE_FORMAT, story.getCreated_on()));

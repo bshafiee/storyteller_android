@@ -15,5 +15,6 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_new_story">NewStoryActivity</string>
     <string name="title_activity_text_piece">TextPieceActivity</string>
+    <string name="title_activity_story_page">StoryPageActivity</string>
 
 </resources>

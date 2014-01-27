@@ -55,8 +55,13 @@ public class MainActivity extends ActionBarActivity{
 		
 	}
 	
-	public void changeView() {
+	public void changeView(View v) {
 		Intent intent = new Intent(this, NewsfeedActivity.class);
+		startActivity(intent);
+	}
+	
+	public void changeViewToStoryPage(View v) {
+		Intent intent = new Intent(this, StoryPageActivity.class);
 		startActivity(intent);
 	}
 	

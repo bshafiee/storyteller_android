@@ -9,6 +9,7 @@ public class StoryModel {
 	private Integer owner;
 	private String category;
 	private String title;
+	private STORY_TYPE type;
 	private MAX_NUM_PIECES_TYPE max_num_pieces;
 	private MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length;
 	private MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length;
@@ -19,6 +20,7 @@ public class StoryModel {
 	public StoryModel() {this.reset();}
 	
 	public StoryModel(Integer id, Integer owner_id, String category, String title,
+			STORY_TYPE s_type,
 			MAX_NUM_PIECES_TYPE max_num_pieces,
 			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length,
 			MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length,
@@ -29,6 +31,7 @@ public class StoryModel {
 		this.owner = owner_id;
 		this.category = category;
 		this.title = title;
+		this.type = s_type;
 		this.max_num_pieces = max_num_pieces;
 		this.max_multimedia_piece_length = max_multimedia_piece_length;
 		this.max_text_piece_length = max_text_piece_length;
@@ -38,6 +41,7 @@ public class StoryModel {
 	}
 
 	public StoryModel(Integer owner_id, String category, String title,
+			STORY_TYPE s_type,
 			MAX_NUM_PIECES_TYPE max_num_pieces,
 			MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length,
 			MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length,
@@ -47,6 +51,7 @@ public class StoryModel {
 		this.owner = owner_id;
 		this.category = category;
 		this.title = title;
+		this.type = s_type;
 		this.max_num_pieces = max_num_pieces;
 		this.max_multimedia_piece_length = max_multimedia_piece_length;
 		this.max_text_piece_length = max_text_piece_length;
@@ -59,6 +64,7 @@ public class StoryModel {
 		this.owner = null;
 		this.category = null;
 		this.title = null;
+		this.type = null;
 		this.max_num_pieces = MAX_NUM_PIECES_TYPE.SHORT;
 		this.max_multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.SHORT;
 		this.max_text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.SHORT;
@@ -147,6 +153,14 @@ public class StoryModel {
 
 	public void setCreated_on(Date created_on) {
 		this.created_on = created_on;
+	}
+
+	public STORY_TYPE getType() {
+		return type;
+	}
+
+	public void setType(STORY_TYPE type) {
+		this.type = type;
 	}
 }
 

@@ -28,6 +28,11 @@
         android:layout_height="wrap_content"
         android:onClick="changeViewTotextPiece"
         android:text="Text Piece" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="changeViewToStoryPage"
+        android:text="Story Page" />
 
     <ImageView
         android:id="@+id/result"

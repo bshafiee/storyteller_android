@@ -106,6 +106,7 @@ public class NewStoryActivity extends Activity {
 				storyType = STORY_TYPE.VIDEO;
 				break;
 		}
+		newStory.setType(storyType);
 		
 		MAX_NUM_PIECES_TYPE numPiece = null;
 		switch(numPiecesRadioGroup.getCheckedRadioButtonId())
@@ -194,6 +195,7 @@ public class NewStoryActivity extends Activity {
 		RequestParams params = new RequestParams();
 		params.add("category", newStory.getCategory());
 		params.add("title", newStory.getTitle());
+		params.add("type", newStory.getType().toString());
 		params.add("max_num_pieces", newStory.getMax_num_pieces().getNumVal().toString());
 		params.add("max_multimedia_piece_length", newStory.getMax_multimedia_piece_length().getNumVal().toString());
 		params.add("max_text_piece_length", newStory.getMax_text_piece_length().getNumVal().toString());
