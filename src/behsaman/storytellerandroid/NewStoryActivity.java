@@ -241,8 +241,7 @@ public class NewStoryActivity extends Activity {
 		toast.show();
 	}
 	
-	public void showFailureToast()
-	{
+	public void showFailureToast() {
 		Context context = this;
 		CharSequence text = "Sorry, an error occured while adding your story :(";
 		int duration = Toast.LENGTH_LONG;

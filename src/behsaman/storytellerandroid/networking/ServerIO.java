@@ -25,6 +25,7 @@ public class ServerIO {
 	public static final String INSERT_STORY_URL = "InsertStory";
 	public static final String INSERT_STORY_PIECE_URL = "InsertStoryPiece";
 	public static final String GET_STORY_URL = "GetStory";
+	public static final String GET_STORY_BY_ID_URL = "GetStoryByID";
 	public static final String GET_PIECE_URL = "GetPiece";
 	public static final String GET_CATEGORY_URL = "GetCategory";
 	//Connection

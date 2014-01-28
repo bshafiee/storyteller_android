@@ -9,107 +9,33 @@
         android:orientation="vertical" >
 
         <TextView
+            android:id="@+id/tv_story_page_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/hello_world" />
-
-        <Button
-            android:id="@+id/contribute"
+            android:text="Story Title" 
+            android:layout_gravity="center"/>
+        
+        <TextView
+        	android:id="@+id/tv_story_page_info"    
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Contribute" />
+            android:text="Story Description" 
+            android:layout_gravity="left"/>
 
         <Button
+            android:id="@+id/bt_story_page_contribute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Contribute" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:onClick="ContributeHandler"
             android:text="Contribute" />
 
         <ListView
-            android:id="@+id/list_story_pieces"
+            android:id="@+id/list_story_page_pieces"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:divider="#b5b5b5"
             android:dividerHeight="1dp"
             android:listSelector="@drawable/list_selector" />
     </LinearLayout>
-
 </ScrollView>

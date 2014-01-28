@@ -9,10 +9,14 @@ import org.json.JSONObject;
 
 import android.R.integer;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
@@ -30,15 +34,16 @@ import com.loopj.android.http.RequestParams;
 public class NewsfeedActivity extends Activity {
 	private static final String TAG = "NewsfeedActivity";
 	
+	public static final String STORY_ID = "behsaman.storytellerandroid.NewsfeedActivity";
+	
 	ListView list;
     LazyAdapter adapter;
+    
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_newfeed);
-		
-		//new XMLFetcher().execute(this);
 		
 		final Activity newsActivity = this;
 		RequestParams params = new RequestParams();
@@ -80,7 +85,13 @@ public class NewsfeedActivity extends Activity {
 							@Override
 							public void onItemClick(AdapterView<?> parent, View view,
 									int position, long id) {
-
+								LazyAdapter adaptor = (LazyAdapter)list.getAdapter();
+								int story_id = adaptor.getStoryID(position);
+								if(story_id > 0)
+									ChangeViewToStoryPage(story_id);
+								else
+									showFailureToast();
+								
 							}
 						});	
 					} catch (JSONException e) {
@@ -90,5 +101,23 @@ public class NewsfeedActivity extends Activity {
             }
 		});
 	}	
+	
+	private void ChangeViewToStoryPage(int storyID) {
+		Intent intent = new Intent(this, StoryPageActivity.class);
+		intent.putExtra(STORY_ID, storyID);
+		startActivity(intent);
+		
+	}
+	
+	public void showFailureToast()
+	{
+		Context context = this;
+		CharSequence text = "Sorry, can't retrive story id :(";
+		int duration = Toast.LENGTH_LONG;
+
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.setGravity(Gravity.CENTER, 0,0);
+		toast.show();
+	}
 	
 }

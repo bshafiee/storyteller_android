@@ -40,6 +40,14 @@ public class LazyAdapter extends BaseAdapter {
         return position;
     }
     
+    public int getStoryID(int position) {
+    	StoryModel story = data.get(position);
+    	if(story!=null)
+    		return story.getId();
+    	else
+    		return -1;
+    }
+    
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi=convertView;
         if(convertView==null)
