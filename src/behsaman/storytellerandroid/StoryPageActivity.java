@@ -1,6 +1,5 @@
 package behsaman.storytellerandroid;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -31,6 +30,8 @@ import com.loopj.android.http.RequestParams;
 public class StoryPageActivity extends Activity {
 
 	private static final String TAG = "StoryPageActivity";
+	
+	public static final String STORY_MODEL = "behsaman.storytellerandroid.StoryPageActivity";
 	
 	private Integer story_id = null;
 	private final StoryModel model = new StoryModel();
@@ -164,11 +165,22 @@ public class StoryPageActivity extends Activity {
 					Log.e(TAG,reqResult.toString());
 					//Update View
 					updateContirbuteionStatus();
+					//Check Queue Size
+					if(queueSize == 1) {//our turn
+						if(model.getType()==STORY_TYPE.TEXT_ONLY) {
+							changeViewToNewTextPiece(model,reqResult);
+						}
+					}
 				} catch (JSONException e) {
 					Log.e(TAG,e.getMessage());
 				}
 			}
 		});
-		
+	}
+
+	private void changeViewToNewTextPiece(StoryModel model, PullRequestResult reqResult) {
+		Intent intent = new Intent(this, TextPieceActivity.class);
+		intent.putExtra(STORY_MODEL, model);
+		startActivity(intent);
 	}
 }

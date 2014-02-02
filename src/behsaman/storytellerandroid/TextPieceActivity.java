@@ -1,5 +1,6 @@
 package behsaman.storytellerandroid;
 
+import behsaman.storytellerandroid.datamodel.StoryModel;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Point;
@@ -21,10 +22,17 @@ public class TextPieceActivity extends Activity {
 
 	private static final String TAG = "TextPieceActivity";
 	
+	StoryModel model = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_text_piece);
+		//UI Elements
+		addUIComponents();
+	}
+
+	private void addUIComponents() {
 		LinearLayout layout_text_piece = (LinearLayout) findViewById(R.id.layout_text_piece);
 		/*
 		 */
@@ -71,8 +79,15 @@ public class TextPieceActivity extends Activity {
 			}
 		});
 		
+		//Get Intent Info
+		model = (StoryModel) getIntent().getSerializableExtra(StoryPageActivity.STORY_MODEL);
+		Log.e(TAG, model.toString());
+		
+		//Set Title
+		TextView titleView = (TextView)findViewById(R.id.tv_text_piece_title);
+		titleView.setText(model.getTitle());
 	}
-
+	
 	public int countWords(String in)
 	{
 		if(in == null)

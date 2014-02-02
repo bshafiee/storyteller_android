@@ -1,8 +1,14 @@
 package behsaman.storytellerandroid.datamodel;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class StoryModel {
+public class StoryModel implements Serializable{
+	/**
+	 * Serial Version ID
+	 */
+	private static final long serialVersionUID = -8315185619566159803L;
+	
 	public static final String DATE_FORMAT = "MMM dd, yyyy"; 
 	//Fields
 	private Integer id;
