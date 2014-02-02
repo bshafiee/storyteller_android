@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.text.format.DateFormat;
 import android.util.Log;
 
 public class Utils {
@@ -28,8 +29,7 @@ public class Utils {
         catch(Exception ex){}
     }
     
-    public static Date parseDate(String pattern, String input)
-    {
+    public static Date parseDate(String pattern, String input) {
     	try {
 			return new SimpleDateFormat(pattern).parse(input);
 		} catch (ParseException e) {

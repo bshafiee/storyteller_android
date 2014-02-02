@@ -1,6 +1,8 @@
 package behsaman.storytellerandroid;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +19,7 @@ import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
 import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_TEXT_PIECE_LENGTH_TYPE;
+import behsaman.storytellerandroid.datamodel.PullRequestResult;
 import behsaman.storytellerandroid.datamodel.STORY_TYPE;
 import behsaman.storytellerandroid.datamodel.StoryModel;
 import behsaman.storytellerandroid.networking.ServerIO;
@@ -40,6 +43,7 @@ public class StoryPageActivity extends Activity {
 		Intent intent = getIntent();
 		this.story_id = intent.getIntExtra(NewsfeedActivity.STORY_ID, -1);
 		this.updateView(); 
+		this.updateContirbuteionStatus();
 	}
 
 	private void updateView() {
@@ -90,14 +94,47 @@ public class StoryPageActivity extends Activity {
 			        Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
 			        if(max_num_pieces.getNumVal() > next_available_piece)
 			        	contribButton.setEnabled(true);
-			        else
-			        	contribButton.setEnabled(false);
 			        	
 					
 				} catch (JSONException e) {
 					Log.e(TAG,e.getMessage());
 				}
             }
+		});
+	}
+
+	private void updateContirbuteionStatus() {
+		//Invalid id
+		if(story_id == null || story_id < 1)
+			return;
+
+		//Send Contribution Request
+		RequestParams params = new RequestParams();
+		params.add("story_id", story_id.toString());
+		ServerIO.getInstance().post(ServerIO.HAS_REQ_CONTRIBUTION_URL, params, new JsonHttpResponseHandler() {
+			@Override
+            public synchronized void onSuccess(JSONObject obj) {
+				try {
+					long request_date = obj.getLong("request_date");
+					int user_id = obj.getInt("user_id");
+					int story_id = obj.getInt("story_id");
+					int story_lock_time = obj.getInt("story_lock_time");
+					Long leftMins = new Date().getTime()-request_date;
+					leftMins /= 1000;//second
+					leftMins /= 60;//Mins
+					Log.e(TAG,"Curr:"+new Date().getTime()+"\tReqDate:"+request_date);
+					UUID generatedUUID = UUID.fromString(obj.getString("generatedUUID"));
+					
+					
+					TextView infoBox = (TextView)findViewById(R.id.tv_story_page_contrib_info);
+			        infoBox.setText("You have "+leftMins+" minutes left to send your piece!");
+			        //Contribute Button
+			        Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
+			        contribButton.setEnabled(false);
+				} catch (Exception e) {
+					Log.e(TAG,e.getMessage());
+				}
+			}
 		});
 	}
 
@@ -109,6 +146,29 @@ public class StoryPageActivity extends Activity {
 	}
 	
 	public void ContributeHandler(View v) {
+		//Invalid id
+		if(story_id == null || story_id < 1)
+			return;
+
+		//Send Contribution Request
+		RequestParams params = new RequestParams();
+		params.add("story_id", story_id.toString());
+		ServerIO.getInstance().post(ServerIO.CONTRIBUTE_REQUEST_URL, params, new JsonHttpResponseHandler() {
+			@Override
+            public synchronized void onSuccess(JSONObject obj) {
+				try {
+					UUID uuid = UUID.fromString(obj.getString("uuid"));
+					int queueSize = obj.getInt("queueSize");
+					Date expDate = new Date(obj.getLong("expDate"));
+					PullRequestResult reqResult = new PullRequestResult(uuid, queueSize, expDate);
+					Log.e(TAG,reqResult.toString());
+					//Update View
+					updateContirbuteionStatus();
+				} catch (JSONException e) {
+					Log.e(TAG,e.getMessage());
+				}
+			}
+		});
 		
 	}
 }

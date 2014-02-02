@@ -28,6 +28,8 @@ public class ServerIO {
 	public static final String GET_STORY_BY_ID_URL = "GetStoryByID";
 	public static final String GET_PIECE_URL = "GetPiece";
 	public static final String GET_CATEGORY_URL = "GetCategory";
+	public static final String CONTRIBUTE_REQUEST_URL = "Contribute";
+	public static final String HAS_REQ_CONTRIBUTION_URL = "HasReqContribution";
 	//Connection
 	private static AsyncHttpClient client = null;
 	private static ServerIO m_instance = new ServerIO();
