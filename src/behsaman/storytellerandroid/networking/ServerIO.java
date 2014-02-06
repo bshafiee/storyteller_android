@@ -4,8 +4,10 @@ import java.io.InputStream;
 import java.security.KeyStore;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.content.Context;
 import android.util.Log;
 import behsaman.storytellerandroid.R;
@@ -35,6 +37,9 @@ public class ServerIO {
 	private static ServerIO m_instance = new ServerIO();
 	//Logged in
 	private static boolean logged_in = false;
+	//JSON RESULTS
+	public static final Integer SUCCESS = 200;
+	public static final Integer FAILURE = 0;
 	
 	private ServerIO () {}
 	
@@ -81,15 +86,16 @@ public class ServerIO {
 			@Override
             public synchronized void onSuccess(JSONObject obj) {
 				try {
-					if(obj.getString("status").equals("Successful"))
+					int status = obj.getInt("Status");
+					if(status == SUCCESS)
 						logged_in = true;
 					else
 						logged_in = false;
 				} catch (Exception e) {
-					e.printStackTrace();
+					Log.e(TAG,e.getMessage());
 				}
-				
             }
+			
 		});
 	}
 	

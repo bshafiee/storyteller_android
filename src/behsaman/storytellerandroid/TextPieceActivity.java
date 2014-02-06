@@ -1,8 +1,13 @@
 package behsaman.storytellerandroid;
 
-import behsaman.storytellerandroid.datamodel.StoryModel;
+import java.util.UUID;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,17 +17,24 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import behsaman.storytellerandroid.datamodel.StoryModel;
+import behsaman.storytellerandroid.networking.ServerIO;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 public class TextPieceActivity extends Activity {
 
 	private static final String TAG = "TextPieceActivity";
-	
-	StoryModel model = null;
+	private StoryModel model = null;
+	private UUID uuid = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +69,13 @@ public class TextPieceActivity extends Activity {
 		layout_text_piece.addView(tView);
 		
 		//Button
-		Button button = new Button(this);		
+		Button addPiecebutton = new Button(this);		
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         params.gravity=Gravity.CENTER;
-        button.setLayoutParams(params);
-		button.setText("Add Piece");
-		layout_text_piece.addView(button);
+        addPiecebutton.setLayoutParams(params);
+		addPiecebutton.setText("Add Piece");
+		layout_text_piece.addView(addPiecebutton);
 		//Word Change event
 		textEditor.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -80,12 +92,54 @@ public class TextPieceActivity extends Activity {
 		});
 		
 		//Get Intent Info
-		model = (StoryModel) getIntent().getSerializableExtra(StoryPageActivity.STORY_MODEL);
-		Log.e(TAG, model.toString());
+		model = (StoryModel) getIntent().getSerializableExtra(StoryPageActivity.STORY_MODEL_KEY);
+		uuid = UUID.fromString(getIntent().getStringExtra(StoryPageActivity.UUID_KEY));
 		
 		//Set Title
 		TextView titleView = (TextView)findViewById(R.id.tv_text_piece_title);
 		titleView.setText(model.getTitle());
+		
+		
+		//On click handler
+		addPiecebutton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String text_value = textEditor.getText().toString();
+				if(text_value != null && text_value.length()>0) {
+					//Send piece
+					RequestParams params = new RequestParams();
+					params.add("story_id", model.getId().toString());
+					params.add("uuid", uuid.toString());
+					params.add("piece_index", model.getNext_available_piece().toString());
+					params.add("text_value", text_value);
+					ServerIO.getInstance().post(ServerIO.INSERT_STORY_PIECE_URL, params, new JsonHttpResponseHandler() {
+					@Override
+		            public synchronized void onSuccess(JSONObject result) {
+						try {
+							if(result.getInt("Status")==ServerIO.FAILURE) 
+							{
+								Log.e(TAG,result.getString("Error"));
+								changeViewToStoryPage(model.getId());
+								return;
+							}
+						} catch (JSONException e1) {
+							Log.e(TAG,e1.getMessage());
+						}
+						
+						//Successful
+						changeViewToStoryPage(model.getId());
+					}
+				});
+				}
+			}
+		});
+	}
+	
+	private void changeViewToStoryPage(int story_id)
+	{
+		Intent intent = new Intent(this, StoryPageActivity.class);
+		intent.putExtra(NewsfeedActivity.STORY_ID, story_id);
+		startActivity(intent);
 	}
 	
 	public int countWords(String in)

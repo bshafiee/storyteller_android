@@ -2,6 +2,8 @@ package behsaman.storytellerandroid.datamodel;
 
 import java.util.Date;
 
+import android.R.integer;
+
 public class PieceModel {
 	//Fields
 	private int id;
@@ -100,7 +102,7 @@ public class PieceModel {
 
 
 
-	public int getIndex() {
+	public Integer getIndex() {
 		return index;
 	}
 

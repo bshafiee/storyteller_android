@@ -145,7 +145,7 @@ public class StoryModel implements Serializable{
 		this.lock_time_mins = lock_time_mins;
 	}
 
-	public int getNext_available_piece() {
+	public Integer getNext_available_piece() {
 		return next_available_piece;
 	}
 

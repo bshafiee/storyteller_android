@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +15,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
 import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
@@ -37,7 +36,7 @@ public class NewsfeedActivity extends Activity {
 	public static final String STORY_ID = "behsaman.storytellerandroid.NewsfeedActivity";
 	
 	ListView list;
-    LazyAdapter adapter;
+    LazyAdapterStories adapter;
     
 
 	@Override
@@ -50,8 +49,24 @@ public class NewsfeedActivity extends Activity {
 		params.add("limit", "100");
 		ServerIO.getInstance().post(ServerIO.GET_STORY_URL, params, new JsonHttpResponseHandler() {
 			@Override
-            public synchronized void onSuccess(JSONArray arr) {
-				ArrayList<StoryModel> stories = new ArrayList<StoryModel>();
+            public synchronized void onSuccess(JSONObject result) {
+				try {
+					if(result.getInt("Status")!=ServerIO.SUCCESS)
+					{
+						Log.e(TAG,result.getString("Error"));
+						return;
+					}
+				} catch (JSONException e1) {
+					Log.e(TAG,e1.getMessage());
+				}
+				
+				JSONArray arr = null;
+				try {
+					arr = result.getJSONArray("data");
+				} catch (JSONException e1) {
+					Log.e(TAG,e1.getMessage());
+				}
+				ArrayList<Object> stories = new ArrayList<Object>();
 				for(int i=0;i<arr.length();i++) {
 					try {
 						JSONObject obj = (JSONObject) arr.get(i);
@@ -75,7 +90,7 @@ public class NewsfeedActivity extends Activity {
 						//Add to UI
 						list=(ListView)findViewById(R.id.list);
 						// Getting adapter by passing xml data ArrayList
-				        adapter=new LazyAdapter(newsActivity, stories);        
+				        adapter=new LazyAdapterStories(newsActivity, stories);        
 				        list.setAdapter(adapter);
 				        
 
@@ -85,7 +100,7 @@ public class NewsfeedActivity extends Activity {
 							@Override
 							public void onItemClick(AdapterView<?> parent, View view,
 									int position, long id) {
-								LazyAdapter adaptor = (LazyAdapter)list.getAdapter();
+								LazyAdapterStories adaptor = (LazyAdapterStories)list.getAdapter();
 								int story_id = adaptor.getStoryID(position);
 								if(story_id > 0)
 									ChangeViewToStoryPage(story_id);
