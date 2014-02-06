@@ -46,11 +46,12 @@
         android:layout_height="wrap_content"
         android:onClick="pickImage"
         android:text="Button" />
-
-    <EditText
-        android:id="@+id/edit_message"
+    <Button
+        android:id="@+id/bt_audio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/edit_message" />
+        android:onClick="goRecord"
+        android:text="Record Audio" />
+
 
 </LinearLayout>

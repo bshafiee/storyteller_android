@@ -71,6 +71,12 @@ public class MainActivity extends ActionBarActivity{
 		startActivity(intent);
 	}
 	
+	public void goRecord(View view)
+	{
+		Intent intent = new Intent(this, AudioPieceActivity.class);
+		startActivity(intent);
+	}
+	
 	private static final int REQUEST_CODE = 1;
     private Bitmap bitmap;
     private ImageView imageView;
