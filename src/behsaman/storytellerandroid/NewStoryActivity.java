@@ -59,8 +59,23 @@ public class NewStoryActivity extends Activity {
 		params.add("limit", "100");
 		ServerIO.getInstance().post(ServerIO.GET_CATEGORY_URL, params, new JsonHttpResponseHandler() {
 			@Override
-            public synchronized void onSuccess(JSONArray arr) {
+            public synchronized void onSuccess(JSONObject result) {
 				List<String> categories = new ArrayList<String>();
+				try {
+					if(result.getInt("Status")!=ServerIO.SUCCESS)
+					{
+						Log.e(TAG,result.getString("Error"));
+						return;
+					}
+				} catch (JSONException e1) {
+					Log.e(TAG,e1.getMessage());
+				}
+				JSONArray arr = null;
+				try {
+					arr = result.getJSONArray("data");
+				} catch (JSONException e1) {
+					Log.e(TAG,e1.getMessage());
+				}
 				for(int i=0;i<arr.length();i++) {
 					try {
 						JSONObject obj = (JSONObject) arr.get(i);
@@ -213,17 +228,16 @@ public class NewStoryActivity extends Activity {
             public synchronized void onSuccess(JSONObject obj) {
 				progress.dismiss();
 				try {
-					if(obj.getString("status").equals("Successful"))
+					if(obj.getInt("Status")!=ServerIO.SUCCESS)
 					{
-						changeViewToFeedActivity();
+						Log.e(TAG,obj.getString("Error"));
+						showFailureToast();
+						return;
 					}
 					else
-					{
-						showFailureToast();
-						Log.e(TAG, "Error in adding Story:"+obj.toString());
-					}
+						changeViewToFeedActivity();
 				} catch (Exception e) {
-					e.printStackTrace();
+					Log.e(TAG,e.getMessage());
 				}
 				
             }

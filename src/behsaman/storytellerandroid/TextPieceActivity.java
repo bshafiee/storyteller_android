@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
@@ -24,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import behsaman.storytellerandroid.datamodel.StoryModel;
 import behsaman.storytellerandroid.networking.ServerIO;
 
@@ -119,15 +121,16 @@ public class TextPieceActivity extends Activity {
 							if(result.getInt("Status")==ServerIO.FAILURE) 
 							{
 								Log.e(TAG,result.getString("Error"));
-								changeViewToStoryPage(model.getId());
+								showFailureToast();
 								return;
 							}
+							else
+								//Successful
+								changeViewToStoryPage(model.getId());
+								
 						} catch (JSONException e1) {
 							Log.e(TAG,e1.getMessage());
 						}
-						
-						//Successful
-						changeViewToStoryPage(model.getId());
 					}
 				});
 				}
@@ -180,5 +183,15 @@ public class TextPieceActivity extends Activity {
 			Measuredheight = d.getHeight();
 		}
 		return Measuredheight;
+	}
+	
+	public void showFailureToast() {
+		Context context = this;
+		CharSequence text = "Sorry, an error occured while adding your piece :(";
+		int duration = Toast.LENGTH_LONG;
+
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.setGravity(Gravity.CENTER, 0,0);
+		toast.show();
 	}
 }

@@ -269,9 +269,10 @@ public class StoryPageActivity extends Activity {
 	}
 
 	private void goToContribetePage() {
-		if(model.getType()==STORY_TYPE.TEXT_ONLY) {
-			changeViewToNewTextPiece(model,generatedUUID);
-		}
+		if(model.getType()==STORY_TYPE.TEXT_ONLY)
+			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
+		else if(model.getType()==STORY_TYPE.AUDIO)
+			changeViewToNewPiece(model, generatedUUID, AudioPieceActivity.class);
 	}
 
 	private void sendContributeRequest() {
@@ -298,9 +299,7 @@ public class StoryPageActivity extends Activity {
 					updateContirbuteionStatus();
 					//Check Queue Size
 					if(queueSize == 1) {//our turn
-						if(model.getType()==STORY_TYPE.TEXT_ONLY) {
-							changeViewToNewTextPiece(model,generatedUUID);
-						}
+						goToContribetePage();
 					}
 					else
 					{
@@ -314,10 +313,11 @@ public class StoryPageActivity extends Activity {
 		
 	}
 
-	private void changeViewToNewTextPiece(StoryModel model, UUID uuid) {
-		Intent intent = new Intent(this, TextPieceActivity.class);
+	private void changeViewToNewPiece(StoryModel model, UUID uuid,Class c) {
+		Intent intent = new Intent(this, c);
 		intent.putExtra(STORY_MODEL_KEY, model);
 		intent.putExtra(UUID_KEY, uuid.toString());
 		startActivity(intent);
 	}
+	
 }
