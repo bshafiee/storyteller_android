@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,9 +40,15 @@ public class StoryPageActivity extends Activity {
 	public static final String STORY_MODEL_KEY = "behsaman.storytellerandroid.StoryPageActivity.STORY_MODEL";
 	public static final String UUID_KEY = "behsaman.storytellerandroid.StoryPageActivity.UUID";
 	
+	private static final int FETCH_TIMEOUT = 5000;
+	
 	private Integer story_id = null;
 	private final StoryModel model = new StoryModel();
 	private UUID generatedUUID = null;
+	
+	//Create ProgressBar
+    private ProgressDialog fetchProgressBar;
+    
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +69,6 @@ public class StoryPageActivity extends Activity {
 		if(story_id == null || story_id < 1)
 			return;
 		
-		final Activity storyPageActivity = this;
 		RequestParams params = new RequestParams();
 		params.add("story_id", story_id.toString());
 		params.add("from_index_inclusive", "0");
@@ -87,38 +93,70 @@ public class StoryPageActivity extends Activity {
 					Log.e(TAG,e1.getMessage());
 				}
 				ArrayList<Object> pieces = new ArrayList<Object>();
+				JSONObject obj = null;
 				for(int i=0;i<arr.length();i++) {
 					try {
-						JSONObject obj = (JSONObject) arr.get(i);
+						obj = (JSONObject) arr.get(i);
 						
 						int id = obj.getInt("id");
 						int index = obj.getInt("index");
-						String text_val = obj.getString("text_val");
+						String text_val = obj.has("text_val")?obj.getString("text_val"):null;
+						String audio_val = obj.has("audio_file_addr")?obj.getString("audio_file_addr"):null;
+						String video_file_addr = obj.has("video_file_addr")?obj.getString("video_file_addr"):null;
+						String picture_file_addr = obj.has("picture_file_add")?obj.getString("picture_file_addr"):null;
 						int creator_id = obj.getInt("creator_id");
 						Date date = Utils.parseDate(StoryModel.DATE_FORMAT, obj.getString("created_on"));
-						PieceModel p = new PieceModel(id, story_id, creator_id, index, text_val, null, null, null, date);
+						PieceModel p = new PieceModel(id, story_id, creator_id, index, text_val, audio_val, video_file_addr, picture_file_addr, date);
 						pieces.add(p);
 					} catch (JSONException e) {
-						Log.e(TAG, "Error in getting JSONObject: "+e.getMessage());
+						Log.e(TAG, "Error in getting JSONObject: "+((obj==null)?"null":obj.toString())+"\tError:"+e.getMessage());
 					}
 					
 				}
 		
-				//Add to UI
-				ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
-				// Getting adapter by passing xml data ArrayList
-		        LazyAdapterTextPieces adapter=new LazyAdapterTextPieces(storyPageActivity, (ArrayList<Object>)pieces);        
-		        list.setAdapter(adapter);
-				        
-		        // Click event for single list row
-		        list.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
-							int position, long id) 
-						{}
-					});
+				//Story Specific Update
+				if(model.getType() == STORY_TYPE.TEXT_ONLY)
+					updateTextStoryPieces(pieces);
+				else if(model.getType() == STORY_TYPE.AUDIO)
+					updateAudioStoryPieces(pieces);
 			}
 		});
+		
+	}
+	
+	private void updateAudioStoryPieces(ArrayList<Object> pieces) {
+		final Activity storyPageActivity = this;
+		
+		//Add to UI
+		ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
+		// Getting adapter by passing xml data ArrayList
+		LazyAdapterAudioPieces adapter=new LazyAdapterAudioPieces(storyPageActivity, (ArrayList<Object>)pieces);        
+        list.setAdapter(adapter);
+		        
+        // Click event for single list row
+        list.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) 
+				{}
+			});
+	}
+	
+	private void updateTextStoryPieces(ArrayList<Object> pieces) {
+		final Activity storyPageActivity = this;
+		//Add to UI
+		ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
+		// Getting adapter by passing xml data ArrayList
+        LazyAdapterTextPieces adapter=new LazyAdapterTextPieces(storyPageActivity, (ArrayList<Object>)pieces);        
+        list.setAdapter(adapter);
+		        
+        // Click event for single list row
+        list.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) 
+				{}
+			});
 	}
 
 	private void updateView() {
