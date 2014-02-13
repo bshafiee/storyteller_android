@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -88,8 +89,71 @@ public class StoryPageActivity extends Activity {
 		params.add("from_index_inclusive", "0");
 		params.add("limit", "-1");//all
 		ServerIO.getInstance().post(ServerIO.GET_PIECE_URL, params, new JsonHttpResponseHandler() {
+			
+			@Override
+			public void onFailure(int statusCode, Header[] headers,
+					String responseBody, Throwable e) {
+				Log.e(TAG,"INJA7");
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers,
+					Throwable e, JSONArray errorResponse) {
+				Log.e(TAG,"INJA6");
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers,
+					Throwable e, JSONObject errorResponse) {
+				Log.e(TAG,"INJA5");
+			}
+
+			@Override
+			public void onFailure(int statusCode, Throwable e,
+					JSONArray errorResponse) {
+				Log.e(TAG,"INJA4");
+			}
+
+			@Override
+			public void onFailure(int statusCode, Throwable e,
+					JSONObject errorResponse) {
+				Log.e(TAG,"INJA3");
+			}
+
+			@Override
+			public void onFailure(Throwable e, JSONArray errorResponse) {
+				Log.e(TAG,"INJA2");
+			}
+
+			@Override
+			public void onFailure(Throwable e, JSONObject errorResponse) {
+				Log.e(TAG,"INJA1");
+			}
+
 			@Override
             public synchronized void onSuccess(JSONObject result) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						while(true) {
+							View b = findViewById(R.id.bt_audio_row_play);
+							//if(b == null)
+								//Log.e(TAG,"FUCKKK");
+							try {
+								Thread.sleep(10);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
+				}).start();
 				try {
 					if(result.getInt("Status")!=ServerIO.SUCCESS)
 					{
@@ -143,9 +207,9 @@ public class StoryPageActivity extends Activity {
 		//Add to UI
 		ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
 		// Getting adapter by passing xml data ArrayList
-		LazyAdapterAudioPieces adapter=new LazyAdapterAudioPieces(storyPageActivity, (ArrayList<Object>)pieces);        
+		final LazyAdapterAudioPieces adapter=new LazyAdapterAudioPieces(storyPageActivity, (ArrayList<Object>)pieces);        
         list.setAdapter(adapter);
-		        
+        pieces = null;
         // Click event for single list row
         list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -160,9 +224,9 @@ public class StoryPageActivity extends Activity {
 		//Add to UI
 		ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
 		// Getting adapter by passing xml data ArrayList
-        LazyAdapterTextPieces adapter=new LazyAdapterTextPieces(storyPageActivity, (ArrayList<Object>)pieces);        
+        LazyAdapterTextPieces adapter = new LazyAdapterTextPieces(storyPageActivity, (ArrayList<Object>)pieces);
         list.setAdapter(adapter);
-		        
+        
         // Click event for single list row
         list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -171,7 +235,7 @@ public class StoryPageActivity extends Activity {
 				{}
 			});
 	}
-
+	
 	private void updateView() {
 		//Invalid id
 		if(story_id == null || story_id < 1)
@@ -249,7 +313,6 @@ public class StoryPageActivity extends Activity {
 		ServerIO.getInstance().post(ServerIO.HAS_REQ_CONTRIBUTION_URL, params, new JsonHttpResponseHandler() {
 			@Override
             public synchronized void onSuccess(JSONObject result) {
-				Log.e(TAG,"Update:"+result);
 				try {
 					if(result.getInt("Status")==ServerIO.FAILURE) 
 					{

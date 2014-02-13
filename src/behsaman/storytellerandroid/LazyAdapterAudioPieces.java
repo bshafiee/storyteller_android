@@ -3,6 +3,7 @@ package behsaman.storytellerandroid;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -11,6 +12,8 @@ import behsaman.storytellerandroid.datamodel.PieceModel;
 
 public class LazyAdapterAudioPieces extends LazyAdapter {
 	
+	private static final String TAG = "LazyAdapterAudioPieces";
+	
     public LazyAdapterAudioPieces(Activity a, ArrayList<Object> d) {
         super(a,d);
     }
@@ -18,7 +21,7 @@ public class LazyAdapterAudioPieces extends LazyAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi=convertView;
         if(convertView==null)
-            vi = inflater.inflate(R.layout.audio_list_row, null);
+        	vi = inflater.inflate(R.layout.audio_list_row, null);
 
         //TextView title = (TextView)vi.findViewById(R.id.title); // title
         //TextView story_desc = (TextView)vi.findViewById(R.id.story_news); 
