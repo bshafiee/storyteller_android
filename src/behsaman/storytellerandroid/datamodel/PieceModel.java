@@ -66,7 +66,7 @@ public class PieceModel {
 	}
 	
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -78,7 +78,7 @@ public class PieceModel {
 
 
 
-	public int getStory_id() {
+	public Integer getStory_id() {
 		return story_id;
 	}
 

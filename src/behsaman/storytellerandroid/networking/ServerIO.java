@@ -9,11 +9,14 @@ import org.json.JSONObject;
 
 import android.R.integer;
 import android.content.Context;
+import android.provider.MediaStore.Files;
 import android.util.Log;
 import behsaman.storytellerandroid.R;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.BinaryHttpResponseHandler;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -50,6 +53,16 @@ public class ServerIO {
 	public void initialize(Context c) {
 		client = new AsyncHttpClient();
 		client.setSSLSocketFactory(newSslSocketFactory(c));
+	}
+	
+	public void download(String url,MyBinaryHttpResponseHandler myBinaryHttpResponseHandler) {
+		if(client == null)
+		{
+			Log.e(TAG,"httpclient not initialized");
+			return;
+		}
+		
+		client.get(url, myBinaryHttpResponseHandler);
 	}
 	
 	public void get(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -102,6 +115,7 @@ public class ServerIO {
 	public boolean isLoggedIn()	{
 		return logged_in;
 	}
+	
 	
 	private SSLSocketFactory newSslSocketFactory(Context context) {
 	    try {

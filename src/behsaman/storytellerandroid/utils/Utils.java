@@ -1,11 +1,13 @@
 package behsaman.storytellerandroid.utils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.content.Context;
 import android.text.format.DateFormat;
 import android.util.Log;
 
@@ -36,5 +38,16 @@ public class Utils {
 			Log.e(TAG, "Error in parsing input date. Input:"+input+"\tPattern:"+pattern+"\t"+e.getMessage());
 			return null;
 		}
+    }
+    
+    public static File getCacheDir(Context context) {
+    	File cacheDir = null;
+    	if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
+            cacheDir=new File(android.os.Environment.getExternalStorageDirectory(),"LazyList");
+        else
+            cacheDir=context.getCacheDir();
+        if(!cacheDir.exists())
+            cacheDir.mkdirs();
+        return cacheDir;
     }
 }

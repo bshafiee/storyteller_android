@@ -1,9 +1,14 @@
 package behsaman.storytellerandroid;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,14 +16,19 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
 import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
@@ -27,6 +37,7 @@ import behsaman.storytellerandroid.datamodel.MAX_TEXT_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.PieceModel;
 import behsaman.storytellerandroid.datamodel.STORY_TYPE;
 import behsaman.storytellerandroid.datamodel.StoryModel;
+import behsaman.storytellerandroid.networking.MyBinaryHttpResponseHandler;
 import behsaman.storytellerandroid.networking.ServerIO;
 import behsaman.storytellerandroid.utils.Utils;
 
@@ -44,12 +55,15 @@ public class StoryPageActivity extends Activity {
 	
 	private Integer story_id = null;
 	private final StoryModel model = new StoryModel();
+	ArrayList<Object> pieces = new ArrayList<Object>();
 	private UUID generatedUUID = null;
 	
 	//Create ProgressBar
     private ProgressDialog fetchProgressBar;
     
-	
+    //Global Play Lock
+    private boolean isPlaying = false;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -92,7 +106,6 @@ public class StoryPageActivity extends Activity {
 				} catch (JSONException e1) {
 					Log.e(TAG,e1.getMessage());
 				}
-				ArrayList<Object> pieces = new ArrayList<Object>();
 				JSONObject obj = null;
 				for(int i=0;i<arr.length();i++) {
 					try {
@@ -356,6 +369,119 @@ public class StoryPageActivity extends Activity {
 		intent.putExtra(STORY_MODEL_KEY, model);
 		intent.putExtra(UUID_KEY, uuid.toString());
 		startActivity(intent);
+	}
+	
+	public void playAudioPieceHandler(View view) {
+		//No Concurrent play
+		if(isPlaying)
+			return;
+		
+		String[] allowedContentTypes = new String[] { };
+		final String dir = Utils.getCacheDir(this).getAbsolutePath();
+		final PieceModel piece = getPieceById((Integer)view.getTag());
+		LinearLayout layout = (LinearLayout) findViewById(R.id.layout_story_page);
+		List<View> views = findViewWithTagRecursively(layout,piece.getId());
+		SeekBar tempSeekBar = null;
+		for(View v:views)
+			if(v instanceof SeekBar)
+				tempSeekBar = (SeekBar) v;
+		final SeekBar sBar = tempSeekBar;
+		ServerIO.getInstance().download(piece.getAudio_file_addr(), 
+				new MyBinaryHttpResponseHandler(allowedContentTypes) {
+			
+			@Override
+			public void onFailure(int statusCode, Header[] headers,
+					byte[] binaryData, Throwable error) {
+				Log.e(TAG,"FAILLLEEEDDD:"+error.getMessage()+"\tStatusCode:"+statusCode+"\tBinaryData:"+binaryData);
+				for(Header h:headers)
+					Log.e(TAG,"Header:"+h+"\t");
+			}
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers,
+					byte[] binaryData) {
+				File f = new File(dir+"/"+piece.getStory_id().toString()+piece.getId().toString());
+		        try {
+		        	FileOutputStream writer = new FileOutputStream(f);
+		        	writer.write(binaryData);
+		        	writer.close();
+		        	playAudioFile(f,sBar);
+				} catch (Exception e) {
+					Log.e(TAG,e.getMessage());
+				}
+			}
+		});
+	}
+	
+	private void playAudioFile(File file,final SeekBar seekBar) {
+		final MediaPlayer player = new MediaPlayer();
+		try {
+			player.setDataSource(file.getAbsolutePath());
+			player.prepare();
+			seekBar.setProgress(0);
+			seekBar.setMax(player.getDuration());
+			final Handler seekHandler = new Handler();
+			final Runnable run = new Runnable() {
+				 
+		        @Override
+		        public void run() {
+		            seekBar.setProgress(player.getCurrentPosition());
+		            seekHandler.postDelayed(this, 100);
+		        }
+		    };
+		    setPlaying(true);
+		    player.start();
+		    run.run();
+			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+				@Override
+				public void onCompletion(MediaPlayer mp) {
+					seekHandler.removeCallbacks(run);
+					player.release();
+					setPlaying(false);
+				}
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private PieceModel getPieceById(int ID) {
+		for(Object o:pieces) {
+			if(((PieceModel)o).getId() == ID)
+				return (PieceModel)o;
+		}
+		return null;
+	}
+	
+	/**
+	 * Get all the views which matches the given Tag recursively
+	 * @param root parent view. for e.g. Layouts
+	 * @param tag tag to look for
+	 * @return List of views
+	 */
+	public static List<View> findViewWithTagRecursively(ViewGroup root, Object tag){
+	    List<View> allViews = new ArrayList<View>();
+
+	    final int childCount = root.getChildCount();
+	    for(int i=0; i<childCount; i++){
+	        final View childView = root.getChildAt(i);
+
+	        if(childView instanceof ViewGroup){
+	          allViews.addAll(findViewWithTagRecursively((ViewGroup)childView, tag));
+	        }
+	        else{
+	            final Object tagView = childView.getTag();
+	            if(tagView != null && tagView.equals(tag))
+	                allViews.add(childView);
+	        }
+	    }
+
+	    return allViews;
+	}
+	
+	private synchronized void setPlaying(boolean isPlay) {
+		this.isPlaying = isPlay;
 	}
 	
 }
