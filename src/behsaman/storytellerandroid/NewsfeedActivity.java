@@ -121,7 +121,6 @@ public class NewsfeedActivity extends Activity {
 		Intent intent = new Intent(this, StoryPageActivity.class);
 		intent.putExtra(STORY_ID, storyID);
 		startActivity(intent);
-		
 	}
 	
 	public void showFailureToast()

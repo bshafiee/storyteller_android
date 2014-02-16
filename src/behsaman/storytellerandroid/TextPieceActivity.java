@@ -35,8 +35,13 @@ import com.loopj.android.http.RequestParams;
 public class TextPieceActivity extends Activity {
 
 	private static final String TAG = "TextPieceActivity";
+	
+	private static final String CURRENT_TEXT_KEY = "TextPieceActivity.CURRENT_TEXT";
+	private static final String CURRENT_CURSOR_POS_KEY = "TextPieceActivity.CURRENT_CURSOR_POS";
 	private StoryModel model = null;
 	private UUID uuid = null;
+	//Components
+	private LinedEditText textEditor;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +50,34 @@ public class TextPieceActivity extends Activity {
 		//UI Elements
 		addUIComponents();
 	}
+	
+	
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		this.textEditor.setText(savedInstanceState.getString(CURRENT_TEXT_KEY));
+		this.textEditor.setSelection(savedInstanceState.getInt(CURRENT_CURSOR_POS_KEY));
+	}
+
+
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(CURRENT_TEXT_KEY, this.textEditor.getText().toString());
+		outState.putInt(CURRENT_CURSOR_POS_KEY, this.textEditor.getSelectionStart());
+	}
+
+
+	
 
 	private void addUIComponents() {
 		LinearLayout layout_text_piece = (LinearLayout) findViewById(R.id.layout_text_piece);
 		/*
 		 */
 		//Add Text Editor
-		final LinedEditText textEditor = new LinedEditText(this, null);
+		textEditor = new LinedEditText(this, null);
 		LinearLayout.LayoutParams linLayout = new LinearLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		int margins = 15;

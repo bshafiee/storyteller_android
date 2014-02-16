@@ -15,11 +15,13 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
 import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
@@ -48,318 +51,373 @@ import com.loopj.android.http.RequestParams;
 public class StoryPageActivity extends Activity {
 
 	private static final String TAG = "StoryPageActivity";
-	
+
 	public static final String STORY_MODEL_KEY = "behsaman.storytellerandroid.StoryPageActivity.STORY_MODEL";
+	public static final String STORY_PIECES_KEY = "behsaman.storytellerandroid.StoryPageActivity.STORY_PIECES";
+	public static final String STORY_SELECTED_PIECE_KEY = "behsaman.storytellerandroid.StoryPageActivity.STORY_SELECTED_PIECE";
 	public static final String UUID_KEY = "behsaman.storytellerandroid.StoryPageActivity.UUID";
-	
+
 	private static final int FETCH_TIMEOUT = 5000;
-	
+
 	private Integer story_id = null;
 	private final StoryModel model = new StoryModel();
 	ArrayList<Object> pieces = new ArrayList<Object>();
 	private UUID generatedUUID = null;
-	
-	//Create ProgressBar
-    private ProgressDialog fetchProgressBar;
-    
-    //Global Play Lock
-    private boolean isPlaying = false;
-    
+
+	// Create ProgressBar
+	private ProgressDialog fetchProgressBar;
+
+	// Global Play Lock
+	private boolean isPlaying = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_story_page);
-		
-		//Get Story ID
+
+		// Get Story ID
 		Intent intent = getIntent();
 		this.story_id = intent.getIntExtra(NewsfeedActivity.STORY_ID, -1);
-		
-		this.updateView(); 
+
+		this.updateView();
 		this.updateContirbuteionStatus();
 		this.updatePieces();
 	}
 
 	private void updatePieces() {
-		//Invalid id
-		if(story_id == null || story_id < 1)
+		// Invalid id
+		if (story_id == null || story_id < 1)
 			return;
-		
+
 		RequestParams params = new RequestParams();
 		params.add("story_id", story_id.toString());
 		params.add("from_index_inclusive", "0");
-		params.add("limit", "-1");//all
-		ServerIO.getInstance().post(ServerIO.GET_PIECE_URL, params, new JsonHttpResponseHandler() {
-			
-			@Override
-			public void onFailure(int statusCode, Header[] headers,
-					String responseBody, Throwable e) {
-				Log.e(TAG,"INJA7");
-			}
+		params.add("limit", "-1");// all
+		ServerIO.getInstance().post(ServerIO.GET_PIECE_URL, params,
+				new JsonHttpResponseHandler() {
 
-			@Override
-			public void onFailure(int statusCode, Header[] headers,
-					Throwable e, JSONArray errorResponse) {
-				Log.e(TAG,"INJA6");
-			}
-
-			@Override
-			public void onFailure(int statusCode, Header[] headers,
-					Throwable e, JSONObject errorResponse) {
-				Log.e(TAG,"INJA5");
-			}
-
-			@Override
-			public void onFailure(int statusCode, Throwable e,
-					JSONArray errorResponse) {
-				Log.e(TAG,"INJA4");
-			}
-
-			@Override
-			public void onFailure(int statusCode, Throwable e,
-					JSONObject errorResponse) {
-				Log.e(TAG,"INJA3");
-			}
-
-			@Override
-			public void onFailure(Throwable e, JSONArray errorResponse) {
-				Log.e(TAG,"INJA2");
-			}
-
-			@Override
-			public void onFailure(Throwable e, JSONObject errorResponse) {
-				Log.e(TAG,"INJA1");
-			}
-
-			@Override
-            public synchronized void onSuccess(JSONObject result) {
-				new Thread(new Runnable() {
 					@Override
-					public void run() {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						while(true) {
-							View b = findViewById(R.id.bt_audio_row_play);
-							//if(b == null)
-								//Log.e(TAG,"FUCKKK");
-							try {
-								Thread.sleep(10);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+					public void onFailure(int statusCode, Header[] headers,
+							String responseBody, Throwable e) {
+						Log.e(TAG, "INJA7"+e.getMessage());
+					}
+
+					@Override
+					public void onFailure(int statusCode, Header[] headers,
+							Throwable e, JSONArray errorResponse) {
+						Log.e(TAG, "INJA6");
+					}
+
+					@Override
+					public void onFailure(int statusCode, Header[] headers,
+							Throwable e, JSONObject errorResponse) {
+						Log.e(TAG, "INJA5");
+					}
+
+					@Override
+					public void onFailure(int statusCode, Throwable e,
+							JSONArray errorResponse) {
+						Log.e(TAG, "INJA4");
+					}
+
+					@Override
+					public void onFailure(int statusCode, Throwable e,
+							JSONObject errorResponse) {
+						Log.e(TAG, "INJA3");
+					}
+
+					@Override
+					public void onFailure(Throwable e, JSONArray errorResponse) {
+						Log.e(TAG, "INJA2");
+					}
+
+					@Override
+					public void onFailure(Throwable e, JSONObject errorResponse) {
+						Log.e(TAG, "INJA1");
+					}
+
+					@Override
+					public synchronized void onSuccess(JSONObject result) {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									Thread.sleep(1000);
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								while (true) {
+									View b = findViewById(R.id.bt_audio_row_play);
+									// if(b == null)
+									// Log.e(TAG,"FUCKKK");
+									try {
+										Thread.sleep(10);
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
 							}
+						}).start();
+						try {
+							if (result.getInt("Status") != ServerIO.SUCCESS) {
+								Log.e(TAG, result.getString("Error"));
+								return;
+							}
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
 						}
+
+						JSONArray arr = null;
+						try {
+							arr = result.getJSONArray("data");
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
+						}
+						JSONObject obj = null;
+						for (int i = 0; i < arr.length(); i++) {
+							try {
+								obj = (JSONObject) arr.get(i);
+
+								int id = obj.getInt("id");
+								int index = obj.getInt("index");
+								String text_val = obj.has("text_val") ? obj
+										.getString("text_val") : null;
+								String audio_val = obj.has("audio_file_addr") ? obj
+										.getString("audio_file_addr") : null;
+								String video_file_addr = obj
+										.has("video_file_addr") ? obj
+										.getString("video_file_addr") : null;
+								String picture_file_addr = obj
+										.has("picture_file_add") ? obj
+										.getString("picture_file_addr") : null;
+								int creator_id = obj.getInt("creator_id");
+								Date date = Utils.parseDate(
+										StoryModel.DATE_FORMAT,
+										obj.getString("created_on"));
+								PieceModel p = new PieceModel(id, story_id,
+										creator_id, index, text_val, audio_val,
+										video_file_addr, picture_file_addr,
+										date);
+								pieces.add(p);
+							} catch (JSONException e) {
+								Log.e(TAG,
+										"Error in getting JSONObject: "
+												+ ((obj == null) ? "null" : obj
+														.toString())
+												+ "\tError:" + e.getMessage());
+							}
+
+						}
+
+						// Story Specific Update
+						if (model.getType() == STORY_TYPE.TEXT_ONLY)
+							updateTextStoryPieces(pieces);
+						else if (model.getType() == STORY_TYPE.AUDIO)
+							updateAudioStoryPieces(pieces);
 					}
-				}).start();
-				try {
-					if(result.getInt("Status")!=ServerIO.SUCCESS)
-					{
-						Log.e(TAG,result.getString("Error"));
-						return;
-					}
-				} catch (JSONException e1) {
-					Log.e(TAG,e1.getMessage());
-				}
-				
-				JSONArray arr = null;
-				try {
-					arr = result.getJSONArray("data");
-				} catch (JSONException e1) {
-					Log.e(TAG,e1.getMessage());
-				}
-				JSONObject obj = null;
-				for(int i=0;i<arr.length();i++) {
-					try {
-						obj = (JSONObject) arr.get(i);
-						
-						int id = obj.getInt("id");
-						int index = obj.getInt("index");
-						String text_val = obj.has("text_val")?obj.getString("text_val"):null;
-						String audio_val = obj.has("audio_file_addr")?obj.getString("audio_file_addr"):null;
-						String video_file_addr = obj.has("video_file_addr")?obj.getString("video_file_addr"):null;
-						String picture_file_addr = obj.has("picture_file_add")?obj.getString("picture_file_addr"):null;
-						int creator_id = obj.getInt("creator_id");
-						Date date = Utils.parseDate(StoryModel.DATE_FORMAT, obj.getString("created_on"));
-						PieceModel p = new PieceModel(id, story_id, creator_id, index, text_val, audio_val, video_file_addr, picture_file_addr, date);
-						pieces.add(p);
-					} catch (JSONException e) {
-						Log.e(TAG, "Error in getting JSONObject: "+((obj==null)?"null":obj.toString())+"\tError:"+e.getMessage());
-					}
-					
-				}
-		
-				//Story Specific Update
-				if(model.getType() == STORY_TYPE.TEXT_ONLY)
-					updateTextStoryPieces(pieces);
-				else if(model.getType() == STORY_TYPE.AUDIO)
-					updateAudioStoryPieces(pieces);
-			}
-		});
-		
+				});
+
 	}
-	
+
 	private void updateAudioStoryPieces(ArrayList<Object> pieces) {
 		final Activity storyPageActivity = this;
-		
-		//Add to UI
-		ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
+
+		// Add to UI
+		ListView list = (ListView) findViewById(R.id.list_story_page_pieces);
 		// Getting adapter by passing xml data ArrayList
-		final LazyAdapterAudioPieces adapter=new LazyAdapterAudioPieces(storyPageActivity, (ArrayList<Object>)pieces);        
-        list.setAdapter(adapter);
-        pieces = null;
-        // Click event for single list row
-        list.setOnItemClickListener(new OnItemClickListener() {
+		final LazyAdapterAudioPieces adapter = new LazyAdapterAudioPieces(
+				storyPageActivity, (ArrayList<Object>) pieces);
+		list.setAdapter(adapter);
+		pieces = null;
+		// Click event for single list row
+		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) 
-				{}
-			});
+					int position, long id) {
+			}
+		});
 	}
-	
+
 	private void updateTextStoryPieces(ArrayList<Object> pieces) {
 		final Activity storyPageActivity = this;
-		//Add to UI
-		ListView list=(ListView)findViewById(R.id.list_story_page_pieces);
+		// Add to UI
+		ListView list = (ListView) findViewById(R.id.list_story_page_pieces);
 		// Getting adapter by passing xml data ArrayList
-        LazyAdapterTextPieces adapter = new LazyAdapterTextPieces(storyPageActivity, (ArrayList<Object>)pieces);
-        list.setAdapter(adapter);
-        
-        // Click event for single list row
-        list.setOnItemClickListener(new OnItemClickListener() {
+		LazyAdapterTextPieces adapter = new LazyAdapterTextPieces(
+				storyPageActivity, (ArrayList<Object>) pieces);
+		list.setAdapter(adapter);
+
+		final Context curContext = this;
+		final ArrayList<Object> curPieces = pieces;
+		// Click event for single list row
+		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) 
-				{}
-			});
+					int position, long id) {
+				//Go to Show View
+				Intent intent = new Intent(curContext, TextviewerSlideActivity.class);
+				intent.putExtra(STORY_PIECES_KEY, curPieces);
+				intent.putExtra(STORY_SELECTED_PIECE_KEY, position);
+				startActivity(intent); 
+			}
+		});
 	}
-	
+
 	private void updateView() {
-		//Invalid id
-		if(story_id == null || story_id < 1)
+		// Invalid id
+		if (story_id == null || story_id < 1)
 			return;
-		
+
 		RequestParams params = new RequestParams();
 		params.add("id", story_id.toString());
-		ServerIO.getInstance().post(ServerIO.GET_STORY_BY_ID_URL, params, new JsonHttpResponseHandler() {
-			@Override
-            public synchronized void onSuccess(JSONObject result) {
-				try {
-					if(result.getInt("Status")==ServerIO.FAILURE) {
-						Log.e(TAG,result.getString("Error"));
-						return;
+		ServerIO.getInstance().post(ServerIO.GET_STORY_BY_ID_URL, params,
+				new JsonHttpResponseHandler() {
+					@Override
+					public synchronized void onSuccess(JSONObject result) {
+						try {
+							if (result.getInt("Status") == ServerIO.FAILURE) {
+								Log.e(TAG, result.getString("Error"));
+								return;
+							}
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
+						}
+						try {
+							JSONObject obj = result.getJSONObject("data");
+							int id = obj.getInt("id");
+							int owner_id = obj.getInt("owner_id");
+							Integer category_id = obj.getInt("category_id");
+							String title = obj.getString("title");
+							STORY_TYPE type = STORY_TYPE.valueOf(obj
+									.getString("type"));
+							MAX_NUM_PIECES_TYPE max_num_pieces = MAX_NUM_PIECES_TYPE
+									.valueOf(obj.getString("max_num_pieces"));
+							MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.valueOf(obj
+									.getString("max_multimedia_piece_length"));
+							MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.valueOf(obj
+									.getString("max_text_piece_length"));
+							LOCK_TIME_MINS lock_time_mins = LOCK_TIME_MINS
+									.valueOf(obj.getString("lock_time_mins"));
+							int next_available_piece = obj
+									.getInt("next_available_piece");
+							Date created_on = Utils.parseDate(
+									StoryModel.DATE_FORMAT,
+									obj.getString("created_on"));
+
+							model.setId(id);
+							model.setOwner_id(owner_id);
+							model.setCategory(category_id.toString());
+							model.setTitle(title);
+							model.setType(type);
+							model.setMax_num_pieces(max_num_pieces);
+							model.setMax_multimedia_piece_length(max_multimedia_piece_length);
+							model.setMax_text_piece_length(max_text_piece_length);
+							model.setLock_time_mins(lock_time_mins);
+							model.setNext_available_piece(next_available_piece);
+							model.setCreated_on(created_on);
+
+							// Setting all values in listview
+							TextView titleBox = (TextView) findViewById(R.id.tv_story_page_title);
+							titleBox.setText(title);
+							String description = "Category: " + category_id;
+							description += "\nCreated By: " + owner_id;
+							description += "\nPieces Left: "
+									+ (max_num_pieces.getNumVal() - next_available_piece);
+							description += "\nStory Type: " + (type.toString());
+							TextView infoBox = (TextView) findViewById(R.id.tv_story_page_info);
+							infoBox.setText(description);
+							Button readButton = (Button) findViewById(R.id.bt_story_page_read);
+							switch (model.getType()) {
+							case AUDIO:
+								readButton.setText("Listen to this Story");
+								break;
+							case COMICS:
+								readButton.setText("Read this Story");
+								break;
+							case TEXT_ONLY:
+								readButton.setText("Read this Story");
+								break;
+							case VIDEO:
+								readButton.setText("Watch this Story");
+								break;
+							default:
+								break;
+							}
+						} catch (JSONException e) {
+							Log.e(TAG, e.getMessage());
+						}
 					}
-				} catch (JSONException e1) {
-					Log.e(TAG,e1.getMessage());
-				}
-				try {
-					JSONObject obj = result.getJSONObject("data");
-					int id = obj.getInt("id");
-					int owner_id = obj.getInt("owner_id");
-					Integer category_id = obj.getInt("category_id");
-					String title = obj.getString("title");
-					STORY_TYPE type = STORY_TYPE.valueOf(obj.getString("type"));
-					MAX_NUM_PIECES_TYPE max_num_pieces = MAX_NUM_PIECES_TYPE.valueOf(obj.getString("max_num_pieces"));
-					MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length = 
-					MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.valueOf(obj.getString("max_multimedia_piece_length"));
-					MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.valueOf(obj.getString("max_text_piece_length"));
-					LOCK_TIME_MINS lock_time_mins = LOCK_TIME_MINS.valueOf(obj.getString("lock_time_mins"));
-					int next_available_piece = obj.getInt("next_available_piece");
-					Date created_on = Utils.parseDate(StoryModel.DATE_FORMAT, obj.getString("created_on"));
-					
-					model.setId(id);
-					model.setOwner_id(owner_id);
-					model.setCategory(category_id.toString());
-					model.setTitle(title);
-					model.setType(type);
-					model.setMax_num_pieces(max_num_pieces);
-					model.setMax_multimedia_piece_length(max_multimedia_piece_length);
-					model.setMax_text_piece_length(max_text_piece_length);
-					model.setLock_time_mins(lock_time_mins);
-					model.setNext_available_piece(next_available_piece);
-					model.setCreated_on(created_on);
-					
-					// Setting all values in listview
-			        TextView titleBox = (TextView)findViewById(R.id.tv_story_page_title);  
-					titleBox.setText(title);
-			        String description = "Category: "+category_id;
-			        description += "\nCreated By: "+owner_id;
-			        description += "\nPieces Left: "+(max_num_pieces.getNumVal() - next_available_piece);
-			        description += "\nStory Type: "+(type.toString());
-			        TextView infoBox = (TextView)findViewById(R.id.tv_story_page_info);
-			        infoBox.setText(description);
-				} catch (JSONException e) {
-					Log.e(TAG,e.getMessage());
-				}
-            }
-		});
+				});
 	}
 
 	private void updateContirbuteionStatus() {
-		//Invalid id
-		if(story_id == null || story_id < 1)
+		// Invalid id
+		if (story_id == null || story_id < 1)
 			return;
-		
-		//Contrib Button
+
+		// Contrib Button
 		Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
 		contribButton.setText("Request to Contribute");
 		contribButton.setEnabled(false);
 
-		//Send Contribution Request
+		// Send Contribution Request
 		RequestParams params = new RequestParams();
 		params.add("story_id", story_id.toString());
-		ServerIO.getInstance().post(ServerIO.HAS_REQ_CONTRIBUTION_URL, params, new JsonHttpResponseHandler() {
-			@Override
-            public synchronized void onSuccess(JSONObject result) {
-				try {
-					if(result.getInt("Status")==ServerIO.FAILURE) 
-					{
-						//No request for this story && Enable Contrib button
-						if(model.getMax_num_pieces().getNumVal() > model.getNext_available_piece()) {
-							Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
-							contribButton.setText("Request to Contribute");
-							contribButton.setEnabled(true);
+		ServerIO.getInstance().post(ServerIO.HAS_REQ_CONTRIBUTION_URL, params,
+				new JsonHttpResponseHandler() {
+					@Override
+					public synchronized void onSuccess(JSONObject result) {
+						try {
+							if (result.getInt("Status") == ServerIO.FAILURE) {
+								// No request for this story && Enable Contrib
+								// button
+								if (model.getMax_num_pieces().getNumVal() > model
+										.getNext_available_piece()) {
+									Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
+									contribButton
+											.setText("Request to Contribute");
+									contribButton.setEnabled(true);
+								}
+								return;
+							}
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
 						}
-						return;
+						// we already sent a request
+						try {
+							JSONObject obj = result.getJSONObject("data");
+							long request_date = obj.getLong("request_date");
+							int queue_index = obj.getInt("queue_index");
+							Long leftMins = new Date().getTime() - request_date;
+							leftMins /= 1000;// second
+							leftMins /= 60;// Mins
+							Log.e(TAG, "Curr:" + new Date().getTime()
+									+ "\tReqDate:" + request_date);
+							generatedUUID = UUID.fromString(obj
+									.getString("generatedUUID"));
+
+							TextView infoBox = (TextView) findViewById(R.id.tv_story_page_contrib_info);
+							infoBox.setText("You have " + leftMins
+									+ " minutes left to send your piece!");
+							// Contribute Button
+							if (queue_index == 1)// our turn
+							{
+								Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
+								contribButton.setEnabled(true);
+								contribButton.setText("Contribute");
+							} else {
+								Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
+								contribButton.setEnabled(false);
+								contribButton.setText("Waiting");
+							}
+
+						} catch (Exception e) {
+							Log.e(TAG, e.getMessage());
+						}
 					}
-				} catch (JSONException e1) {
-					Log.e(TAG,e1.getMessage());
-				}
-				// we already sent a request
-				try {
-					JSONObject obj = result.getJSONObject("data");
-					long request_date = obj.getLong("request_date");
-					int queue_index = obj.getInt("queue_index");
-					Long leftMins = new Date().getTime()-request_date;
-					leftMins /= 1000;//second
-					leftMins /= 60;//Mins
-					Log.e(TAG,"Curr:"+new Date().getTime()+"\tReqDate:"+request_date);
-					generatedUUID = UUID.fromString(obj.getString("generatedUUID"));
-					
-					
-					TextView infoBox = (TextView)findViewById(R.id.tv_story_page_contrib_info);
-			        infoBox.setText("You have "+leftMins+" minutes left to send your piece!");
-			        //Contribute Button
-			        if(queue_index == 1)//our turn
-			        {
-			        	Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
-			        	contribButton.setEnabled(true);
-			        	contribButton.setText("Contribute");
-			        }
-			        else
-			        {
-			        	Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
-			        	contribButton.setEnabled(false);
-			        	contribButton.setText("Waiting");
-			        }
-			        
-				} catch (Exception e) {
-					Log.e(TAG,e.getMessage());
-				}
-			}
-		});
+				});
 	}
 
 	@Override
@@ -368,115 +426,119 @@ public class StoryPageActivity extends Activity {
 		getMenuInflater().inflate(R.menu.story_page, menu);
 		return true;
 	}
-	
+
 	public void ContributeHandler(View v) {
-		//Invalid id
-		if(story_id == null || story_id < 1)
+		// Invalid id
+		if (story_id == null || story_id < 1)
 			return;
 
 		Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
-    	if(contribButton.getText().equals("Request to Contribute"))
-    		sendContributeRequest();
-    	else 
-    		goToContribetePage();
-		
+		if (contribButton.getText().equals("Request to Contribute"))
+			sendContributeRequest();
+		else
+			goToContribetePage();
+
 	}
 
 	private void goToContribetePage() {
-		if(model.getType()==STORY_TYPE.TEXT_ONLY)
+		if (model.getType() == STORY_TYPE.TEXT_ONLY)
 			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
-		else if(model.getType()==STORY_TYPE.AUDIO)
+		else if (model.getType() == STORY_TYPE.AUDIO)
 			changeViewToNewPiece(model, generatedUUID, AudioPieceActivity.class);
 	}
 
 	private void sendContributeRequest() {
-		//Send Contribution Request
+		// Send Contribution Request
 		RequestParams params = new RequestParams();
 		params.add("story_id", story_id.toString());
-		ServerIO.getInstance().post(ServerIO.CONTRIBUTE_REQUEST_URL, params, new JsonHttpResponseHandler() {
-			@Override
-            public synchronized void onSuccess(JSONObject result) {
-				try {
-					if(result.getInt("Status")==ServerIO.FAILURE) {
-						Log.e(TAG,result.getString("Error"));
-						return;
+		ServerIO.getInstance().post(ServerIO.CONTRIBUTE_REQUEST_URL, params,
+				new JsonHttpResponseHandler() {
+					@Override
+					public synchronized void onSuccess(JSONObject result) {
+						try {
+							if (result.getInt("Status") == ServerIO.FAILURE) {
+								Log.e(TAG, result.getString("Error"));
+								return;
+							}
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
+						}
+						try {
+							JSONObject obj = result.getJSONObject("data");
+							generatedUUID = UUID.fromString(obj
+									.getString("uuid"));
+							int queueSize = obj.getInt("queueIndex");
+							Date expDate = new Date(obj.getLong("expDate"));
+							// Update View
+							updateContirbuteionStatus();
+							// Check Queue Size
+							if (queueSize == 1) {// our turn
+								goToContribetePage();
+							} else {
+								updateContirbuteionStatus();
+							}
+						} catch (JSONException e) {
+							Log.e(TAG, e.getMessage());
+						}
 					}
-				} catch (JSONException e1) {
-					Log.e(TAG,e1.getMessage());
-				}
-				try {
-					JSONObject obj = result.getJSONObject("data");
-					generatedUUID = UUID.fromString(obj.getString("uuid"));
-					int queueSize = obj.getInt("queueIndex");
-					Date expDate = new Date(obj.getLong("expDate"));
-					//Update View
-					updateContirbuteionStatus();
-					//Check Queue Size
-					if(queueSize == 1) {//our turn
-						goToContribetePage();
-					}
-					else
-					{
-						updateContirbuteionStatus();
-					}
-				} catch (JSONException e) {
-					Log.e(TAG,e.getMessage());
-				}
-			}
-		});
-		
+				});
+
 	}
 
-	private void changeViewToNewPiece(StoryModel model, UUID uuid,Class c) {
+	private void changeViewToNewPiece(StoryModel model, UUID uuid, Class c) {
 		Intent intent = new Intent(this, c);
 		intent.putExtra(STORY_MODEL_KEY, model);
 		intent.putExtra(UUID_KEY, uuid.toString());
 		startActivity(intent);
 	}
-	
+
 	public void playAudioPieceHandler(View view) {
-		//No Concurrent play
-		if(isPlaying)
+		// No Concurrent play
+		if (isPlaying)
 			return;
-		
-		String[] allowedContentTypes = new String[] { };
+
+		String[] allowedContentTypes = new String[] {};
 		final String dir = Utils.getCacheDir(this).getAbsolutePath();
-		final PieceModel piece = getPieceById((Integer)view.getTag());
+		final PieceModel piece = getPieceById((Integer) view.getTag());
 		LinearLayout layout = (LinearLayout) findViewById(R.id.layout_story_page);
-		List<View> views = findViewWithTagRecursively(layout,piece.getId());
+		List<View> views = findViewWithTagRecursively(layout, piece.getId());
 		SeekBar tempSeekBar = null;
-		for(View v:views)
-			if(v instanceof SeekBar)
+		for (View v : views)
+			if (v instanceof SeekBar)
 				tempSeekBar = (SeekBar) v;
 		final SeekBar sBar = tempSeekBar;
-		ServerIO.getInstance().download(piece.getAudio_file_addr(), 
+		ServerIO.getInstance().download(piece.getAudio_file_addr(),
 				new MyBinaryHttpResponseHandler(allowedContentTypes) {
-			
-			@Override
-			public void onFailure(int statusCode, Header[] headers,
-					byte[] binaryData, Throwable error) {
-				Log.e(TAG,"FAILLLEEEDDD:"+error.getMessage()+"\tStatusCode:"+statusCode+"\tBinaryData:"+binaryData);
-				for(Header h:headers)
-					Log.e(TAG,"Header:"+h+"\t");
-			}
 
-			@Override
-			public void onSuccess(int statusCode, Header[] headers,
-					byte[] binaryData) {
-				File f = new File(dir+"/"+piece.getStory_id().toString()+piece.getId().toString());
-		        try {
-		        	FileOutputStream writer = new FileOutputStream(f);
-		        	writer.write(binaryData);
-		        	writer.close();
-		        	playAudioFile(f,sBar);
-				} catch (Exception e) {
-					Log.e(TAG,e.getMessage());
-				}
-			}
-		});
+					@Override
+					public void onFailure(int statusCode, Header[] headers,
+							byte[] binaryData, Throwable error) {
+						Log.e(TAG, "FAILLLEEEDDD:" + error.getMessage()
+								+ "\tStatusCode:" + statusCode
+								+ "\tBinaryData:" + binaryData);
+						for (Header h : headers)
+							Log.e(TAG, "Header:" + h + "\t");
+					}
+
+					@Override
+					public void onSuccess(int statusCode, Header[] headers,
+							byte[] binaryData) {
+						File f = new File(dir + "/"
+								+ piece.getStory_id().toString()
+								+ piece.getId().toString());
+						try {
+							FileOutputStream writer = new FileOutputStream(f);
+							writer.write(binaryData);
+							writer.close();
+							playAudioFile(f, sBar);
+						} catch (Exception e) {
+							Log.e(TAG, e.getMessage());
+						}
+					}
+				});
 	}
-	
-	private void playAudioFile(File file,final SeekBar seekBar) {
+
+	private void playAudioFile(File file, final SeekBar seekBar) {
 		final MediaPlayer player = new MediaPlayer();
 		try {
 			player.setDataSource(file.getAbsolutePath());
@@ -485,16 +547,16 @@ public class StoryPageActivity extends Activity {
 			seekBar.setMax(player.getDuration());
 			final Handler seekHandler = new Handler();
 			final Runnable run = new Runnable() {
-				 
-		        @Override
-		        public void run() {
-		            seekBar.setProgress(player.getCurrentPosition());
-		            seekHandler.postDelayed(this, 100);
-		        }
-		    };
-		    setPlaying(true);
-		    player.start();
-		    run.run();
+
+				@Override
+				public void run() {
+					seekBar.setProgress(player.getCurrentPosition());
+					seekHandler.postDelayed(this, 100);
+				}
+			};
+			setPlaying(true);
+			player.start();
+			run.run();
 			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 				@Override
 				public void onCompletion(MediaPlayer mp) {
@@ -508,43 +570,88 @@ public class StoryPageActivity extends Activity {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private PieceModel getPieceById(int ID) {
-		for(Object o:pieces) {
-			if(((PieceModel)o).getId() == ID)
-				return (PieceModel)o;
+		for (Object o : pieces) {
+			if (((PieceModel) o).getId() == ID)
+				return (PieceModel) o;
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get all the views which matches the given Tag recursively
-	 * @param root parent view. for e.g. Layouts
-	 * @param tag tag to look for
+	 * 
+	 * @param root
+	 *            parent view. for e.g. Layouts
+	 * @param tag
+	 *            tag to look for
 	 * @return List of views
 	 */
-	public static List<View> findViewWithTagRecursively(ViewGroup root, Object tag){
-	    List<View> allViews = new ArrayList<View>();
+	public static List<View> findViewWithTagRecursively(ViewGroup root,
+			Object tag) {
+		List<View> allViews = new ArrayList<View>();
 
-	    final int childCount = root.getChildCount();
-	    for(int i=0; i<childCount; i++){
-	        final View childView = root.getChildAt(i);
+		final int childCount = root.getChildCount();
+		for (int i = 0; i < childCount; i++) {
+			final View childView = root.getChildAt(i);
 
-	        if(childView instanceof ViewGroup){
-	          allViews.addAll(findViewWithTagRecursively((ViewGroup)childView, tag));
-	        }
-	        else{
-	            final Object tagView = childView.getTag();
-	            if(tagView != null && tagView.equals(tag))
-	                allViews.add(childView);
-	        }
-	    }
+			if (childView instanceof ViewGroup) {
+				allViews.addAll(findViewWithTagRecursively(
+						(ViewGroup) childView, tag));
+			} else {
+				final Object tagView = childView.getTag();
+				if (tagView != null && tagView.equals(tag))
+					allViews.add(childView);
+			}
+		}
 
-	    return allViews;
+		return allViews;
 	}
-	
+
 	private synchronized void setPlaying(boolean isPlay) {
 		this.isPlaying = isPlay;
 	}
 	
+	public void readStoryHandler(View v) {
+		Intent intent = null;
+		if(pieces == null)
+		{
+			showFailureToast("Sorry :(\nFailed to fetch Story Pieces.");
+			return;
+		}
+		else if(pieces.size()==0)
+		{
+			showFailureToast("This Story has not piece yet.");
+			return;
+		}
+		switch (model.getType()) {
+		case TEXT_ONLY:
+			intent = new Intent(this, TextviewerSlideActivity.class);
+			intent.putExtra(STORY_PIECES_KEY, pieces);
+			startActivity(intent); 
+			break;
+
+		default:
+			break;
+		}
+		
+	}
+	
+	private void showFailureToast(String msg)
+	{
+		Context context = this;
+		int duration = Toast.LENGTH_LONG;
+
+		Toast toast = Toast.makeText(context, msg, duration);
+		toast.setGravity(Gravity.CENTER, 0,0);
+		toast.show();
+	}
+	
+	@Override
+    public void onBackPressed() {
+		Intent intent = new Intent(this, NewsfeedActivity.class);
+		startActivity(intent);
+    }
+
 }

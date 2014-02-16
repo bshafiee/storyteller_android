@@ -13,10 +13,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 public class MainActivity extends ActionBarActivity{
 	LinedEditText lined;
@@ -24,12 +21,7 @@ public class MainActivity extends ActionBarActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		//setContentView(R.layout.activity_newfeed);
-        imageView = (ImageView) findViewById(R.id.result);
-        lined = new LinedEditText(this, null);
-        lined.setLayoutParams(new LayoutParams(250,250));
-        LinearLayout layout = (LinearLayout)findViewById(R.id.mainlinearlayout);
-        layout.addView(lined);
+        
 	}
 
 	@Override
@@ -60,20 +52,10 @@ public class MainActivity extends ActionBarActivity{
 		startActivity(intent);
 	}
 	
-	public void changeViewToStoryPage(View v) {
-		Intent intent = new Intent(this, StoryPageActivity.class);
-		startActivity(intent);
-	}
 	
-	public void changeViewTotextPiece(View view)
+	public void goSlide(View view)
 	{
-		Intent intent = new Intent(this, TextPieceActivity.class);
-		startActivity(intent);
-	}
-	
-	public void goRecord(View view)
-	{
-		Intent intent = new Intent(this, AudioPieceActivity.class);
+		Intent intent = new Intent(this, TextviewerSlideActivity.class);
 		startActivity(intent);
 	}
 	

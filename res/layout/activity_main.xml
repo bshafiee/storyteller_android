@@ -10,11 +10,7 @@
     tools:context=".MainActivity" 
     android:id="@+id/mainlinearlayout">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="signIn"
-        android:text="@string/button_send" />
+    
 
     <Button
         android:id="@+id/button1"
@@ -22,36 +18,15 @@
         android:layout_height="wrap_content"
         android:onClick="changeView"
         android:text="ChangeView" />
-    <Button
-        android:id="@+id/bt_textpiece"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="changeViewTotextPiece"
-        android:text="Text Piece" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="changeViewToStoryPage"
-        android:text="Story Page" />
+    
 
-    <ImageView
-        android:id="@+id/result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_profile" />
-
-    <Button
-        android:id="@+id/bt_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="pickImage"
-        android:text="Button" />
+    
     <Button
         android:id="@+id/bt_audio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="goRecord"
-        android:text="Record Audio" />
+        android:onClick="goSlide"
+        android:text="Slide View" />
 
 
 </LinearLayout>

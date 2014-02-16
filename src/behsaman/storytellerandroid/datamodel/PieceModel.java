@@ -1,10 +1,13 @@
 package behsaman.storytellerandroid.datamodel;
 
+import java.io.Serializable;
 import java.util.Date;
 
-import android.R.integer;
-
-public class PieceModel {
+public class PieceModel implements Serializable {
+	/**
+	 * Serial Version ID
+	 */
+	private static final long serialVersionUID = -2760435638889066148L;
 	//Fields
 	private int id;
 	private int story_id;

@@ -17,5 +17,6 @@
     <string name="title_activity_text_piece">TextPieceActivity</string>
     <string name="title_activity_story_page">StoryPageActivity</string>
     <string name="title_activity_audio_piece">AudioPieceActivity</string>
+    <string name="title_activity_textviewer">TextviewerActivity</string>
 
 </resources>
