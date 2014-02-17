@@ -7,18 +7,26 @@ import java.util.ArrayList;
 
 import org.apache.http.Header;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import behsaman.storytellerandroid.datamodel.PieceModel;
 import behsaman.storytellerandroid.networking.MyBinaryHttpResponseHandler;
 import behsaman.storytellerandroid.networking.ServerIO;
 import behsaman.storytellerandroid.utils.Utils;
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.Menu;
+import behsaman.storytellerandroid.visualizer.VisualizerView;
+import behsaman.storytellerandroid.visualizer.renderer.BarGraphRenderer;
+import behsaman.storytellerandroid.visualizer.renderer.CircleBarRenderer;
+import behsaman.storytellerandroid.visualizer.renderer.CircleRenderer;
+import behsaman.storytellerandroid.visualizer.renderer.LineRenderer;
 
 public class AudiostoryPlayerActivity extends Activity {
 
@@ -44,7 +52,10 @@ public class AudiostoryPlayerActivity extends Activity {
 	private int curPiece = 0;
 
 	// Story Pieces
-	ArrayList<Object> pieces = null;
+	private ArrayList<Object> pieces = null;
+
+	// Visualizer
+	private VisualizerView mVisualizerView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +63,78 @@ public class AudiostoryPlayerActivity extends Activity {
 		setContentView(R.layout.activity_audiostory_player);
 		// Instantiate Progressbar
 		fetchProgressbar = new ProgressDialog(this);
-		//Get intent info
+		// Get intent info
 		Intent intent = getIntent();
- 		this.pieces = (ArrayList<Object>) intent.getSerializableExtra(StoryPageActivity.STORY_PIECES_KEY);
-		//Step one
+		this.pieces = (ArrayList<Object>) intent
+				.getSerializableExtra(StoryPageActivity.STORY_PIECES_KEY);
+		// Init visualizer
+		initVisualizer();
+		// Step one
 		stepOne();
+	}
+
+	private void initVisualizer() {
+		// We need to link the visualizer view to the media player so that
+		// it displays something
+		mVisualizerView = (VisualizerView) findViewById(R.id.visualizerView);
+		mVisualizerView.link(mPlayer);
+
+		// Start with just line renderer
+		addCircleRenderer();
+	}
+
+	// Methods for adding renderers to visualizer
+	private void addBarGraphRenderers() {
+		Paint paint = new Paint();
+		paint.setStrokeWidth(50f);
+		paint.setAntiAlias(true);
+		paint.setColor(Color.argb(200, 56, 138, 252));
+		BarGraphRenderer barGraphRendererBottom = new BarGraphRenderer(16,
+				paint, false);
+		mVisualizerView.addRenderer(barGraphRendererBottom);
+
+		Paint paint2 = new Paint();
+		paint2.setStrokeWidth(12f);
+		paint2.setAntiAlias(true);
+		paint2.setColor(Color.argb(200, 181, 111, 233));
+		BarGraphRenderer barGraphRendererTop = new BarGraphRenderer(4, paint2,
+				true);
+		mVisualizerView.addRenderer(barGraphRendererTop);
+	}
+
+	private void addCircleBarRenderer() {
+		Paint paint = new Paint();
+		paint.setStrokeWidth(8f);
+		paint.setAntiAlias(true);
+		paint.setXfermode(new PorterDuffXfermode(Mode.LIGHTEN));
+		paint.setColor(Color.argb(255, 222, 92, 143));
+		CircleBarRenderer circleBarRenderer = new CircleBarRenderer(paint, 32,
+				true);
+		mVisualizerView.addRenderer(circleBarRenderer);
+	}
+
+	private void addCircleRenderer() {
+		Paint paint = new Paint();
+		paint.setStrokeWidth(3f);
+		paint.setAntiAlias(true);
+		paint.setColor(Color.argb(255, 222, 92, 143));
+		CircleRenderer circleRenderer = new CircleRenderer(paint, true);
+		mVisualizerView.addRenderer(circleRenderer);
+	}
+
+	private void addLineRenderer() {
+		Paint linePaint = new Paint();
+		linePaint.setStrokeWidth(1f);
+		linePaint.setAntiAlias(true);
+		linePaint.setColor(Color.argb(88, 0, 128, 255));
+
+		Paint lineFlashPaint = new Paint();
+		lineFlashPaint.setStrokeWidth(5f);
+		lineFlashPaint.setAntiAlias(true);
+		lineFlashPaint.setColor(Color.argb(188, 255, 255, 255));
+		LineRenderer lineRenderer = new LineRenderer(linePaint, lineFlashPaint,
+				true);
+		mVisualizerView.addRenderer(lineRenderer);
 	}
 
 	@Override
@@ -130,9 +208,9 @@ public class AudiostoryPlayerActivity extends Activity {
 				@Override
 				public void onCompletion(MediaPlayer mp) {
 					// seekHandler.removeCallbacks(run);
-					
-					//Clear buffer piece one
-					bufferPieceOne= null;
+
+					// Clear buffer piece one
+					bufferPieceOne = null;
 					// Start Downloading piece two
 					if (curPiece > pieces.size())
 						finishPlaying();
@@ -164,7 +242,7 @@ public class AudiostoryPlayerActivity extends Activity {
 					@Override
 					public void onSuccess(int statusCode, Header[] headers,
 							byte[] binaryData) {
-						
+
 						File f = new File(dir + "/"
 								+ piece.getStory_id().toString()
 								+ piece.getId().toString());
@@ -176,7 +254,9 @@ public class AudiostoryPlayerActivity extends Activity {
 							curPiece++;
 							bufferPieceTwo = f;
 						} catch (Exception e) {
-							Log.e(TAG, e.getMessage()==null?"NULL EXCEPTION":e.getMessage());
+							Log.e(TAG,
+									e.getMessage() == null ? "NULL EXCEPTION"
+											: e.getMessage());
 						}
 						stepThree();
 					}
@@ -185,23 +265,28 @@ public class AudiostoryPlayerActivity extends Activity {
 	}
 
 	private synchronized void stepThree() {
-		//Buffer two is ready && and buffer piece one is done with playing
-		if (bufferPieceTwo != null && bufferPieceOne == null) // we have to first play buffer piece 2
+		// Buffer two is ready && and buffer piece one is done with playing
+		if (bufferPieceTwo != null && bufferPieceOne == null) // we have to
+																// first play
+																// buffer piece
+																// 2
 		{
 			mPlayer.release();
 			mPlayer = new MediaPlayer();
+			mVisualizerView.link(mPlayer);
 			Log.d("TAG------->", "player is released & recreated");
 			bufferPieceOne = new File(bufferPieceTwo.getAbsolutePath());
 			bufferPieceTwo = null;
 			stepTwo();
-		} else { //buffertwo not ready
-			//keep showing progress bar
+		} else { // buffertwo not ready
+			// keep showing progress bar
 		}
 	}
 
 	private void finishPlaying() {
 		mPlayer.release();
-		Log.e(TAG,"Finishedddddd");
+		mVisualizerView.release();
+		Log.e(TAG, "Finishedddddd");
 	}
 
 }
