@@ -168,5 +168,12 @@ public class StoryModel implements Serializable{
 	public void setType(STORY_TYPE type) {
 		this.type = type;
 	}
+
+	@Override
+	public String toString() {
+		return "ID:"+this.id+"\tTitle:"+this.title;
+	}
+
+	
 }
 

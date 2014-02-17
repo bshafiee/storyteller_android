@@ -33,11 +33,11 @@ import com.loopj.android.http.RequestParams;
 public class NewsfeedActivity extends Activity {
 	private static final String TAG = "NewsfeedActivity";
 	
-	public static final String STORY_ID = "behsaman.storytellerandroid.NewsfeedActivity";
+	public static final String STORY_MODEL_KEY = "behsaman.storytellerandroid.NewsfeedActivity.STORYMODELKEY";
 	
-	ListView list;
-    LazyAdapterStories adapter;
-    
+	private ListView list;
+    private LazyAdapterStories adapter;
+    private ArrayList<Object> stories;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,7 +66,7 @@ public class NewsfeedActivity extends Activity {
 				} catch (JSONException e1) {
 					Log.e(TAG,e1.getMessage());
 				}
-				ArrayList<Object> stories = new ArrayList<Object>();
+				stories = new ArrayList<Object>();
 				for(int i=0;i<arr.length();i++) {
 					try {
 						JSONObject obj = (JSONObject) arr.get(i);
@@ -83,7 +83,7 @@ public class NewsfeedActivity extends Activity {
 						int next_available_piece = obj.getInt("next_available_piece");
 						Date created_on = Utils.parseDate(StoryModel.DATE_FORMAT, obj.getString("created_on"));
 						
-						StoryModel story = new StoryModel(id, owner_id, category_id.toString(), title, type,max_num_pieces, max_multimedia_piece_length, 
+						final StoryModel story = new StoryModel(id, owner_id, category_id.toString(), title, type,max_num_pieces, max_multimedia_piece_length, 
 												max_text_piece_length, lock_time_mins, next_available_piece, created_on);
 						stories.add(story);
 						
@@ -103,7 +103,7 @@ public class NewsfeedActivity extends Activity {
 								LazyAdapterStories adaptor = (LazyAdapterStories)list.getAdapter();
 								int story_id = adaptor.getStoryID(position);
 								if(story_id > 0)
-									ChangeViewToStoryPage(story_id);
+									ChangeViewToStoryPage((StoryModel) stories.get(position));
 								else
 									showFailureToast();
 								
@@ -117,9 +117,9 @@ public class NewsfeedActivity extends Activity {
 		});
 	}	
 	
-	private void ChangeViewToStoryPage(int storyID) {
+	private void ChangeViewToStoryPage(StoryModel story) {
 		Intent intent = new Intent(this, StoryPageActivity.class);
-		intent.putExtra(STORY_ID, storyID);
+		intent.putExtra(STORY_MODEL_KEY, story);
 		startActivity(intent);
 	}
 	

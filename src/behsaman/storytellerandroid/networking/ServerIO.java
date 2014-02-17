@@ -4,19 +4,14 @@ import java.io.InputStream;
 import java.security.KeyStore;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.content.Context;
-import android.provider.MediaStore.Files;
 import android.util.Log;
 import behsaman.storytellerandroid.R;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BinaryHttpResponseHandler;
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -25,6 +20,7 @@ public class ServerIO {
 	//URLs
 	public static final String BASE_URL = "https://www.noveldevelopments.com:8443/";
 	public static final String LOGIN_URL = "login.jsp";
+	public static final String CHECK_LOGIN_URL = "SuccessfulLogin";
 	public static final String INSERT_USER_URL = "InsertUser";
 	public static final String INSERT_CATEGORY_URL = "InsertCategory";
 	public static final String INSERT_STORY_URL = "InsertStory";
@@ -36,7 +32,7 @@ public class ServerIO {
 	public static final String CONTRIBUTE_REQUEST_URL = "Contribute";
 	public static final String HAS_REQ_CONTRIBUTION_URL = "HasReqContribution";
 	//Connection
-	private static AsyncHttpClient client = null;
+	private static final AsyncHttpClient client = new AsyncHttpClient();
 	private static ServerIO m_instance = new ServerIO();
 	//Logged in
 	private static boolean logged_in = false;
@@ -51,14 +47,13 @@ public class ServerIO {
 	}
 	
 	public void initialize(Context c) {
-		client = new AsyncHttpClient();
 		client.setSSLSocketFactory(newSslSocketFactory(c));
 	}
 	
 	public void download(String url,MyBinaryHttpResponseHandler myBinaryHttpResponseHandler) {
 		if(client == null)
 		{
-			Log.e(TAG,"httpclient not initialized");
+			Log.e(TAG,"httpclient not initialized:Download("+url+")");
 			return;
 		}
 		
@@ -68,7 +63,7 @@ public class ServerIO {
 	public void get(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		if(client == null)
 		{
-			Log.e(TAG,"httpclient not initialized");
+			Log.e(TAG,"httpclient not initialized:Get("+relativeURL+")");
 			return;
 		}
 		client.get(BASE_URL+relativeURL, params, responseHandler);
@@ -77,7 +72,7 @@ public class ServerIO {
 	public void post(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		if(client == null)
 		{
-			Log.e(TAG,"httpclient not initialized");
+			Log.e(TAG,"httpclient not initialized:Post("+relativeURL+")");
 			return;
 		}
 		client.post(BASE_URL+relativeURL, params, responseHandler);
@@ -87,7 +82,7 @@ public class ServerIO {
 	{
 		if(client == null)
 		{
-			Log.e(TAG,"httpclient not initialized");
+			Log.e(TAG,"httpclient not initialized:Login");
 			return;
 		}
 		
@@ -113,6 +108,32 @@ public class ServerIO {
 	}
 	
 	public boolean isLoggedIn()	{
+		return logged_in;
+	}
+	
+	public boolean checkLoginStatus()	{
+		if(client == null)
+		{
+			Log.e(TAG,"httpclient not initialized:CheckLoginStatus");
+			return false;
+		}
+		
+		RequestParams params = new RequestParams();
+		logged_in = false;
+		post(ServerIO.CHECK_LOGIN_URL, params, new JsonHttpResponseHandler() {
+			@Override
+            public synchronized void onSuccess(JSONObject obj) {
+				try {
+					int status = obj.getInt("Status");
+					if(status == SUCCESS)
+						logged_in = true;
+					else
+						logged_in = false;
+				} catch (Exception e) {
+					Log.e(TAG,e.getMessage());
+				}
+            }
+		});
 		return logged_in;
 	}
 	

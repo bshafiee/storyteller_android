@@ -122,7 +122,7 @@ public class AudioPieceActivity extends Activity {
 
 	private void changeViewToStoryPage(int story_id) {
 		Intent intent = new Intent(this, StoryPageActivity.class);
-		intent.putExtra(NewsfeedActivity.STORY_ID, story_id);
+		intent.putExtra(NewsfeedActivity.STORY_MODEL_KEY, this.model);
 		startActivity(intent);
 	}
 

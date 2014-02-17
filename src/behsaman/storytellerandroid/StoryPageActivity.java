@@ -28,16 +28,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
-import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
-import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
-import behsaman.storytellerandroid.datamodel.MAX_TEXT_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.PieceModel;
 import behsaman.storytellerandroid.datamodel.STORY_TYPE;
 import behsaman.storytellerandroid.datamodel.StoryModel;
@@ -59,8 +54,7 @@ public class StoryPageActivity extends Activity {
 
 	private static final int FETCH_TIMEOUT = 5000;
 
-	private Integer story_id = null;
-	private final StoryModel model = new StoryModel();
+	private StoryModel model;
 	ArrayList<Object> pieces = new ArrayList<Object>();
 	private UUID generatedUUID = null;
 
@@ -75,9 +69,9 @@ public class StoryPageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_story_page);
 
-		// Get Story ID
+		// Get Story 
 		Intent intent = getIntent();
-		this.story_id = intent.getIntExtra(NewsfeedActivity.STORY_ID, -1);
+		this.model = (StoryModel) intent.getSerializableExtra(NewsfeedActivity.STORY_MODEL_KEY);
 
 		this.updateView();
 		this.updateContirbuteionStatus();
@@ -86,11 +80,11 @@ public class StoryPageActivity extends Activity {
 
 	private void updatePieces() {
 		// Invalid id
-		if (story_id == null || story_id < 1)
+		if (model == null)
 			return;
 
 		RequestParams params = new RequestParams();
-		params.add("story_id", story_id.toString());
+		params.add("story_id", model.getId().toString());
 		params.add("from_index_inclusive", "0");
 		params.add("limit", "-1");// all
 		ServerIO.getInstance().post(ServerIO.GET_PIECE_URL, params,
@@ -137,29 +131,7 @@ public class StoryPageActivity extends Activity {
 					}
 
 					@Override
-					public synchronized void onSuccess(JSONObject result) {
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-								while (true) {
-									View b = findViewById(R.id.bt_audio_row_play);
-									// if(b == null)
-									// Log.e(TAG,"FUCKKK");
-									try {
-										Thread.sleep(10);
-									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}
-						}).start();
+					public synchronized void onSuccess(final JSONObject result) {
 						try {
 							if (result.getInt("Status") != ServerIO.SUCCESS) {
 								Log.e(TAG, result.getString("Error"));
@@ -168,6 +140,7 @@ public class StoryPageActivity extends Activity {
 						} catch (JSONException e1) {
 							Log.e(TAG, e1.getMessage());
 						}
+						
 
 						JSONArray arr = null;
 						try {
@@ -196,7 +169,7 @@ public class StoryPageActivity extends Activity {
 								Date date = Utils.parseDate(
 										StoryModel.DATE_FORMAT,
 										obj.getString("created_on"));
-								PieceModel p = new PieceModel(id, story_id,
+								PieceModel p = new PieceModel(id, model.getId(),
 										creator_id, index, text_val, audio_val,
 										video_file_addr, picture_file_addr,
 										date);
@@ -210,12 +183,14 @@ public class StoryPageActivity extends Activity {
 							}
 
 						}
-
+						
 						// Story Specific Update
 						if (model.getType() == STORY_TYPE.TEXT_ONLY)
 							updateTextStoryPieces(pieces);
 						else if (model.getType() == STORY_TYPE.AUDIO)
 							updateAudioStoryPieces(pieces);
+						else
+							Log.e(TAG,"WHAT THE FFUCKKKKK ?"+model.getType());
 					}
 				});
 
@@ -230,7 +205,6 @@ public class StoryPageActivity extends Activity {
 		final LazyAdapterAudioPieces adapter = new LazyAdapterAudioPieces(
 				storyPageActivity, (ArrayList<Object>) pieces);
 		list.setAdapter(adapter);
-		pieces = null;
 		// Click event for single list row
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -268,94 +242,40 @@ public class StoryPageActivity extends Activity {
 
 	private void updateView() {
 		// Invalid id
-		if (story_id == null || story_id < 1)
+		if (model == null)
 			return;
 
-		RequestParams params = new RequestParams();
-		params.add("id", story_id.toString());
-		ServerIO.getInstance().post(ServerIO.GET_STORY_BY_ID_URL, params,
-				new JsonHttpResponseHandler() {
-					@Override
-					public synchronized void onSuccess(JSONObject result) {
-						try {
-							if (result.getInt("Status") == ServerIO.FAILURE) {
-								Log.e(TAG, result.getString("Error"));
-								return;
-							}
-						} catch (JSONException e1) {
-							Log.e(TAG, e1.getMessage());
-						}
-						try {
-							JSONObject obj = result.getJSONObject("data");
-							int id = obj.getInt("id");
-							int owner_id = obj.getInt("owner_id");
-							Integer category_id = obj.getInt("category_id");
-							String title = obj.getString("title");
-							STORY_TYPE type = STORY_TYPE.valueOf(obj
-									.getString("type"));
-							MAX_NUM_PIECES_TYPE max_num_pieces = MAX_NUM_PIECES_TYPE
-									.valueOf(obj.getString("max_num_pieces"));
-							MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.valueOf(obj
-									.getString("max_multimedia_piece_length"));
-							MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.valueOf(obj
-									.getString("max_text_piece_length"));
-							LOCK_TIME_MINS lock_time_mins = LOCK_TIME_MINS
-									.valueOf(obj.getString("lock_time_mins"));
-							int next_available_piece = obj
-									.getInt("next_available_piece");
-							Date created_on = Utils.parseDate(
-									StoryModel.DATE_FORMAT,
-									obj.getString("created_on"));
-
-							model.setId(id);
-							model.setOwner_id(owner_id);
-							model.setCategory(category_id.toString());
-							model.setTitle(title);
-							model.setType(type);
-							model.setMax_num_pieces(max_num_pieces);
-							model.setMax_multimedia_piece_length(max_multimedia_piece_length);
-							model.setMax_text_piece_length(max_text_piece_length);
-							model.setLock_time_mins(lock_time_mins);
-							model.setNext_available_piece(next_available_piece);
-							model.setCreated_on(created_on);
-
-							// Setting all values in listview
-							TextView titleBox = (TextView) findViewById(R.id.tv_story_page_title);
-							titleBox.setText(title);
-							String description = "Category: " + category_id;
-							description += "\nCreated By: " + owner_id;
-							description += "\nPieces Left: "
-									+ (max_num_pieces.getNumVal() - next_available_piece);
-							description += "\nStory Type: " + (type.toString());
-							TextView infoBox = (TextView) findViewById(R.id.tv_story_page_info);
-							infoBox.setText(description);
-							Button readButton = (Button) findViewById(R.id.bt_story_page_read);
-							switch (model.getType()) {
-							case AUDIO:
-								readButton.setText("Listen to this Story");
-								break;
-							case COMICS:
-								readButton.setText("Read this Story");
-								break;
-							case TEXT_ONLY:
-								readButton.setText("Read this Story");
-								break;
-							case VIDEO:
-								readButton.setText("Watch this Story");
-								break;
-							default:
-								break;
-							}
-						} catch (JSONException e) {
-							Log.e(TAG, e.getMessage());
-						}
-					}
-				});
+		// Setting all values in listview
+		TextView titleBox = (TextView) findViewById(R.id.tv_story_page_title);
+		titleBox.setText(model.getTitle());
+		String description = "Category: " + model.getCategory();
+		description += "\nCreated By: " + model.getOwner_id();
+		description += "\nPieces Left: "
+				+ (model.getMax_num_pieces().getNumVal() - model.getNext_available_piece());
+		description += "\nStory Type: " + (model.getType().toString());
+		TextView infoBox = (TextView) findViewById(R.id.tv_story_page_info);
+		infoBox.setText(description);
+		Button readButton = (Button) findViewById(R.id.bt_story_page_read);
+		switch (model.getType()) {
+		case AUDIO:
+			readButton.setText("Listen to this Story");
+			break;
+		case COMICS:
+			readButton.setText("Read this Story");
+			break;
+		case TEXT_ONLY:
+			readButton.setText("Read this Story");
+			break;
+		case VIDEO:
+			readButton.setText("Watch this Story");
+			break;
+		default:
+			break;
+		}
 	}
-
 	private void updateContirbuteionStatus() {
 		// Invalid id
-		if (story_id == null || story_id < 1)
+		if (model == null)
 			return;
 
 		// Contrib Button
@@ -365,7 +285,7 @@ public class StoryPageActivity extends Activity {
 
 		// Send Contribution Request
 		RequestParams params = new RequestParams();
-		params.add("story_id", story_id.toString());
+		params.add("story_id", model.getId().toString());
 		ServerIO.getInstance().post(ServerIO.HAS_REQ_CONTRIBUTION_URL, params,
 				new JsonHttpResponseHandler() {
 					@Override
@@ -430,7 +350,7 @@ public class StoryPageActivity extends Activity {
 
 	public void ContributeHandler(View v) {
 		// Invalid id
-		if (story_id == null || story_id < 1)
+		if (model == null)
 			return;
 
 		Button contribButton = (Button) findViewById(R.id.bt_story_page_contribute);
@@ -451,7 +371,7 @@ public class StoryPageActivity extends Activity {
 	private void sendContributeRequest() {
 		// Send Contribution Request
 		RequestParams params = new RequestParams();
-		params.add("story_id", story_id.toString());
+		params.add("story_id", model.getId().toString());
 		ServerIO.getInstance().post(ServerIO.CONTRIBUTE_REQUEST_URL, params,
 				new JsonHttpResponseHandler() {
 					@Override
