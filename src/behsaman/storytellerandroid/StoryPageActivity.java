@@ -99,7 +99,7 @@ public class StoryPageActivity extends Activity {
 					@Override
 					public void onFailure(int statusCode, Header[] headers,
 							String responseBody, Throwable e) {
-						Log.e(TAG, "INJA7"+e.getMessage());
+						Log.e(TAG, "INJA7" + e.getMessage());
 					}
 
 					@Override
@@ -256,11 +256,12 @@ public class StoryPageActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				//Go to Show View
-				Intent intent = new Intent(curContext, TextviewerSlideActivity.class);
+				// Go to Show View
+				Intent intent = new Intent(curContext,
+						TextviewerSlideActivity.class);
 				intent.putExtra(STORY_PIECES_KEY, curPieces);
 				intent.putExtra(STORY_SELECTED_PIECE_KEY, position);
-				startActivity(intent); 
+				startActivity(intent);
 			}
 		});
 	}
@@ -566,8 +567,7 @@ public class StoryPageActivity extends Activity {
 				}
 			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage());
 		}
 	}
 
@@ -612,16 +612,13 @@ public class StoryPageActivity extends Activity {
 	private synchronized void setPlaying(boolean isPlay) {
 		this.isPlaying = isPlay;
 	}
-	
+
 	public void readStoryHandler(View v) {
 		Intent intent = null;
-		if(pieces == null)
-		{
+		if (pieces == null) {
 			showFailureToast("Sorry :(\nFailed to fetch Story Pieces.");
 			return;
-		}
-		else if(pieces.size()==0)
-		{
+		} else if (pieces.size() == 0) {
 			showFailureToast("This Story has not piece yet.");
 			return;
 		}
@@ -629,29 +626,33 @@ public class StoryPageActivity extends Activity {
 		case TEXT_ONLY:
 			intent = new Intent(this, TextviewerSlideActivity.class);
 			intent.putExtra(STORY_PIECES_KEY, pieces);
-			startActivity(intent); 
+			startActivity(intent);
+			break;
+		case AUDIO:
+			intent = new Intent(this, AudiostoryPlayerActivity.class);
+			intent.putExtra(STORY_PIECES_KEY, pieces);
+			startActivity(intent);
 			break;
 
 		default:
 			break;
 		}
-		
+
 	}
-	
-	private void showFailureToast(String msg)
-	{
+
+	private void showFailureToast(String msg) {
 		Context context = this;
 		int duration = Toast.LENGTH_LONG;
 
 		Toast toast = Toast.makeText(context, msg, duration);
-		toast.setGravity(Gravity.CENTER, 0,0);
+		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
 	}
-	
+
 	@Override
-    public void onBackPressed() {
+	public void onBackPressed() {
 		Intent intent = new Intent(this, NewsfeedActivity.class);
 		startActivity(intent);
-    }
+	}
 
 }

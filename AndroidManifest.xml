@@ -67,6 +67,10 @@
             android:name="behsaman.storytellerandroid.TextviewerSlideActivity"
             android:label="@string/title_activity_textviewer" >
         </activity>
+        <activity
+            android:name="behsaman.storytellerandroid.AudiostoryPlayerActivity"
+            android:label="@string/title_activity_audiostory_player" >
+        </activity>
     </application>
 
 </manifest>
