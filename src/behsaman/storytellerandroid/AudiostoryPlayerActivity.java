@@ -3,6 +3,7 @@ package behsaman.storytellerandroid;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.http.Header;
@@ -18,6 +19,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import behsaman.storytellerandroid.datamodel.PieceModel;
 import behsaman.storytellerandroid.networking.MyBinaryHttpResponseHandler;
 import behsaman.storytellerandroid.networking.ServerIO;
@@ -46,7 +48,7 @@ public class AudiostoryPlayerActivity extends Activity {
 	private File bufferPieceOne = null, bufferPieceTwo = null;
 
 	// Mediaplayer
-	private MediaPlayer mPlayer = new MediaPlayer();
+	private MediaPlayer mPlayer = null;
 
 	// Current playing piece
 	private int curPiece = 0;
@@ -55,7 +57,13 @@ public class AudiostoryPlayerActivity extends Activity {
 	private ArrayList<Object> pieces = null;
 
 	// Visualizer
-	private VisualizerView mVisualizerView;
+	private VisualizerView mVisualizerView = null;
+	
+	//Is Playing?
+	private boolean isPlaying = false;
+	
+	//LastPiece played
+	private boolean lastPieceDownloaded = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +73,27 @@ public class AudiostoryPlayerActivity extends Activity {
 		fetchProgressbar = new ProgressDialog(this);
 		// Get intent info
 		Intent intent = getIntent();
-		this.pieces = (ArrayList<Object>) intent
-				.getSerializableExtra(StoryPageActivity.STORY_PIECES_KEY);
+		Serializable s = intent.getSerializableExtra(StoryPageActivity.STORY_PIECES_KEY);
+		this.pieces = (s != null)?(ArrayList<Object>)s:null;
+	}
+	
+	public void playHandler(View v) {
+		if(isPlaying)
+			return;
+		mPlayer = new MediaPlayer();
+		setIsPlaying(true);
+		this.lastPieceDownloaded = false;
+		this.curPiece = 0;
 		// Init visualizer
 		initVisualizer();
 		// Step one
 		stepOne();
+		Log.e(TAG,"STEP ONEEEEEEEE");
 	}
 
 	private void initVisualizer() {
+		if(mVisualizerView != null)
+			return;
 		// We need to link the visualizer view to the media player so that
 		// it displays something
 		mVisualizerView = (VisualizerView) findViewById(R.id.visualizerView);
@@ -145,6 +165,7 @@ public class AudiostoryPlayerActivity extends Activity {
 	}
 
 	private synchronized void stepOne() {
+		
 		if (bufferPieceOne == null) {
 			final String dir = Utils.getCacheDir(this).getAbsolutePath();
 			final PieceModel piece = (PieceModel) pieces.get(curPiece);
@@ -211,8 +232,9 @@ public class AudiostoryPlayerActivity extends Activity {
 
 					// Clear buffer piece one
 					bufferPieceOne = null;
+					Log.e(TAG, "CUR:"+curPiece);
 					// Start Downloading piece two
-					if (curPiece > pieces.size())
+					if (curPiece == pieces.size() && bufferPieceTwo==null && lastPieceDownloaded)
 						finishPlaying();
 					else
 						stepThree();
@@ -223,7 +245,10 @@ public class AudiostoryPlayerActivity extends Activity {
 		}
 		// Start Downloading piece two (if exist)
 		if (curPiece >= pieces.size())
+		{
+			this.lastPieceDownloaded = true;
 			return;// Nothing left to do
+		}
 		final String dir = Utils.getCacheDir(this).getAbsolutePath();
 		final PieceModel piece = (PieceModel) pieces.get(curPiece);
 		// Start downloading piece one and show progress bar
@@ -284,9 +309,46 @@ public class AudiostoryPlayerActivity extends Activity {
 	}
 
 	private void finishPlaying() {
+		setIsPlaying(false);
 		mPlayer.release();
-		mVisualizerView.release();
+		mPlayer = null;
+		bufferPieceOne = null;
+		bufferPieceTwo = null;
 		Log.e(TAG, "Finishedddddd");
 	}
 
+	private void cleanUp() {
+		if (mPlayer != null) {
+			if(mVisualizerView!=null)
+				mVisualizerView.release();
+			if(mPlayer.isPlaying())
+				mPlayer.stop();
+			mPlayer.release();
+			mPlayer = null;
+		}
+		bufferPieceOne = null;
+		bufferPieceTwo = null;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		cleanUp();
+		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		cleanUp();
+		super.onDestroy();
+	}
+
+	private synchronized void setIsPlaying(boolean val) {
+		this.isPlaying = val;
+	}
+	
 }
