@@ -114,6 +114,7 @@ public class AudioPieceActivity extends Activity {
 						// Successful
 						changeViewToStoryPage(model.getId());
 					}
+					
 				});
 		
 	}

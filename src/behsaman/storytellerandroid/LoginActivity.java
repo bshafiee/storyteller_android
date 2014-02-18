@@ -59,7 +59,7 @@ public class LoginActivity extends Activity {
 							if(ServerIO.getInstance().isLoggedIn())
 							{
 								// Switching to Register screen
-				                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				                Intent i = new Intent(getApplicationContext(), NewsfeedActivity.class);
 				                startActivity(i);
 								break;
 							}

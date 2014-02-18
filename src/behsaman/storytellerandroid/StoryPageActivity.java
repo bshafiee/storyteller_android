@@ -91,9 +91,15 @@ public class StoryPageActivity extends Activity {
 				new JsonHttpResponseHandler() {
 
 					@Override
+					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+							Throwable arg3) {
+						ServerIO.getInstance().connectionError(StoryPageActivity.this);
+					}
+					
+					@Override
 					public void onFailure(int statusCode, Header[] headers,
 							String responseBody, Throwable e) {
-						Log.e(TAG, "INJA7" + e.getMessage());
+							ServerIO.getInstance().connectionError(StoryPageActivity.this);
 					}
 
 					@Override
@@ -289,6 +295,12 @@ public class StoryPageActivity extends Activity {
 		ServerIO.getInstance().post(ServerIO.HAS_REQ_CONTRIBUTION_URL, params,
 				new JsonHttpResponseHandler() {
 					@Override
+					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+							Throwable arg3) {
+						ServerIO.getInstance().connectionError(StoryPageActivity.this);
+					}
+			
+					@Override
 					public synchronized void onSuccess(JSONObject result) {
 						try {
 							if (result.getInt("Status") == ServerIO.FAILURE) {
@@ -374,6 +386,12 @@ public class StoryPageActivity extends Activity {
 		params.add("story_id", model.getId().toString());
 		ServerIO.getInstance().post(ServerIO.CONTRIBUTE_REQUEST_URL, params,
 				new JsonHttpResponseHandler() {
+					@Override
+					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+							Throwable arg3) {
+						ServerIO.getInstance().connectionError(StoryPageActivity.this);
+					}
+			
 					@Override
 					public synchronized void onSuccess(JSONObject result) {
 						try {

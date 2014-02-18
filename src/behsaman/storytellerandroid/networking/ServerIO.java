@@ -3,16 +3,27 @@ package behsaman.storytellerandroid.networking;
 import java.io.InputStream;
 import java.security.KeyStore;
 
+import org.apache.http.Header;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.json.JSONObject;
 
+import android.app.ActivityManager;
+import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.sax.StartElementListener;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.Toast;
+import behsaman.storytellerandroid.LoginActivity;
 import behsaman.storytellerandroid.R;
+import behsaman.storytellerandroid.StoryPageActivity;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestHandle;
 import com.loopj.android.http.RequestParams;
 
 public class ServerIO {
@@ -32,7 +43,7 @@ public class ServerIO {
 	public static final String CONTRIBUTE_REQUEST_URL = "Contribute";
 	public static final String HAS_REQ_CONTRIBUTION_URL = "HasReqContribution";
 	//Connection
-	private static final AsyncHttpClient client = new AsyncHttpClient();
+	private static AsyncHttpClient client;
 	private static ServerIO m_instance = new ServerIO();
 	//Logged in
 	private static boolean logged_in = false;
@@ -47,35 +58,37 @@ public class ServerIO {
 	}
 	
 	public void initialize(Context c) {
+		client = new AsyncHttpClient();
 		client.setSSLSocketFactory(newSslSocketFactory(c));
+		m_instance = new ServerIO();
 	}
 	
-	public void download(String url,MyBinaryHttpResponseHandler myBinaryHttpResponseHandler) {
+	public RequestHandle download(String url,MyBinaryHttpResponseHandler myBinaryHttpResponseHandler) {
 		if(client == null)
 		{
 			Log.e(TAG,"httpclient not initialized:Download("+url+")");
-			return;
+			return null;
 		}
 		
-		client.get(url, myBinaryHttpResponseHandler);
+		return client.get(url, myBinaryHttpResponseHandler);
 	}
 	
-	public void get(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+	public RequestHandle get(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		if(client == null)
 		{
 			Log.e(TAG,"httpclient not initialized:Get("+relativeURL+")");
-			return;
+			return null;
 		}
-		client.get(BASE_URL+relativeURL, params, responseHandler);
+		return client.get(BASE_URL+relativeURL, params, responseHandler);
 	}
 	
-	public void post(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+	public RequestHandle post(String relativeURL, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		if(client == null)
 		{
 			Log.e(TAG,"httpclient not initialized:Post("+relativeURL+")");
-			return;
+			return null;
 		}
-		client.post(BASE_URL+relativeURL, params, responseHandler);
+		return client.post(BASE_URL+relativeURL, params, responseHandler);
 	}
 	
 	public void login(String user, String pass)
@@ -103,7 +116,6 @@ public class ServerIO {
 					Log.e(TAG,e.getMessage());
 				}
             }
-			
 		});
 	}
 	
@@ -111,11 +123,11 @@ public class ServerIO {
 		return logged_in;
 	}
 	
-	public boolean checkLoginStatus()	{
+	public void checkLoginStatus()	{
 		if(client == null)
 		{
 			Log.e(TAG,"httpclient not initialized:CheckLoginStatus");
-			return false;
+			logged_in = false;
 		}
 		
 		RequestParams params = new RequestParams();
@@ -133,8 +145,20 @@ public class ServerIO {
 					Log.e(TAG,e.getMessage());
 				}
             }
+
+			@Override
+			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+					Throwable arg3) {
+				Log.e(TAG,"CONNECTION ERROR:"+arg3.getMessage());
+				logged_in = false;
+			}
+
+			@Override
+			public void onFailure(String responseBody, Throwable error) {
+				Log.e(TAG,"CONNECTION ERROR:"+error.getMessage()+" RespBody:"+responseBody);
+				logged_in = false;
+			}
 		});
-		return logged_in;
 	}
 	
 	
@@ -151,5 +175,21 @@ public class ServerIO {
 	    } catch (Exception e) {
 	      throw new AssertionError(e);
 	    }
+	}
+
+	public void connectionError(Context c) {
+		logged_in = false;
+		checkLoginStatus();
+		showConnectionErrorToast(c);
+		//Change Intent to the Login Page
+		Intent intent = new Intent(c, LoginActivity.class);
+		c.startActivity(intent);
+	}
+	
+	private void showConnectionErrorToast(Context c) {
+		int duration = Toast.LENGTH_LONG;
+		Toast toast = Toast.makeText(c, "    Sorry :( \nConnectivity Error.", duration);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
 	}
 }

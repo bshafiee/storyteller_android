@@ -3,6 +3,7 @@ package behsaman.storytellerandroid;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +59,11 @@ public class NewStoryActivity extends Activity {
 		RequestParams params = new RequestParams();
 		params.add("limit", "100");
 		ServerIO.getInstance().post(ServerIO.GET_CATEGORY_URL, params, new JsonHttpResponseHandler() {
+			@Override
+			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+					Throwable arg3) {
+				ServerIO.getInstance().connectionError(NewStoryActivity.this);
+			}
 			@Override
             public synchronized void onSuccess(JSONObject result) {
 				List<String> categories = new ArrayList<String>();
@@ -224,6 +230,11 @@ public class NewStoryActivity extends Activity {
 		
         progress.show();
 		ServerIO.getInstance().post(ServerIO.INSERT_STORY_URL, params, new JsonHttpResponseHandler() {
+			@Override
+			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+					Throwable arg3) {
+				ServerIO.getInstance().connectionError(NewStoryActivity.this);
+			}
 			@Override
             public synchronized void onSuccess(JSONObject obj) {
 				progress.dismiss();

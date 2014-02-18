@@ -178,8 +178,7 @@ public class AudiostoryPlayerActivity extends Activity {
 							Log.e(TAG, "FAILLLEEEDDD:" + error.getMessage()
 									+ "\tStatusCode:" + statusCode
 									+ "\tBinaryData:" + binaryData);
-							for (Header h : headers)
-								Log.e(TAG, "Header:" + h + "\t");
+							ServerIO.getInstance().connectionError(AudiostoryPlayerActivity.this);
 						}
 
 						@Override
@@ -260,8 +259,7 @@ public class AudiostoryPlayerActivity extends Activity {
 						Log.e(TAG, "FAILLLEEEDDD:" + error.getMessage()
 								+ "\tStatusCode:" + statusCode
 								+ "\tBinaryData:" + binaryData);
-						for (Header h : headers)
-							Log.e(TAG, "Header:" + h + "\t");
+						ServerIO.getInstance().connectionError(AudiostoryPlayerActivity.this);
 					}
 
 					@Override
@@ -296,7 +294,8 @@ public class AudiostoryPlayerActivity extends Activity {
 																// buffer piece
 																// 2
 		{
-			mPlayer.release();
+			if(mPlayer!=null)
+				mPlayer.release();
 			mPlayer = new MediaPlayer();
 			mVisualizerView.link(mPlayer);
 			Log.d("TAG------->", "player is released & recreated");
