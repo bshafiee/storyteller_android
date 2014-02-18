@@ -25,12 +25,14 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestHandle;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 
 public class ServerIO {
 	private static final String TAG = "ServerIO";
 	//URLs
 	public static final String BASE_URL = "https://www.noveldevelopments.com:8443/";
 	public static final String LOGIN_URL = "login.jsp";
+	public static final String LOGOUT_URL = "logout";
 	public static final String CHECK_LOGIN_URL = "SuccessfulLogin";
 	public static final String INSERT_USER_URL = "InsertUser";
 	public static final String INSERT_CATEGORY_URL = "InsertCategory";
@@ -61,6 +63,7 @@ public class ServerIO {
 		client = new AsyncHttpClient();
 		client.setSSLSocketFactory(newSslSocketFactory(c));
 		m_instance = new ServerIO();
+		logged_in = false;
 	}
 	
 	public RequestHandle download(String url,MyBinaryHttpResponseHandler myBinaryHttpResponseHandler) {
@@ -191,5 +194,25 @@ public class ServerIO {
 		Toast toast = Toast.makeText(c, "    Sorry :( \nConnectivity Error.", duration);
 		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
+	}
+
+	public void logout(final Context c) {
+		if(client == null)
+		{
+			Log.e(TAG,"httpclient not initialized:Logout");
+			return;
+		}
+		
+		RequestParams params = new RequestParams();
+		post(ServerIO.LOGOUT_URL, params, new TextHttpResponseHandler() {
+
+			@Override
+			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+				logged_in = false;
+				//Change Intent to the Login Page
+				Intent intent = new Intent(c, LoginActivity.class);
+				c.startActivity(intent);
+			}
+		});
 	}
 }

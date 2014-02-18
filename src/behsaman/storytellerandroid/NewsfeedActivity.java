@@ -58,21 +58,38 @@ public class NewsfeedActivity extends ActionBarActivity {
 		case R.id.action_new_story:
 			changeViewToCreateNewStory();
 			return true;
+		case R.id.action_logout:
+			ServerIO.getInstance().logout(this);
 		}
+		
 		return false;
 	}
 
 	public void changeViewToCreateNewStory() {
 		Intent intent = new Intent(this, NewStoryActivity.class);
 		startActivity(intent);
-
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_newfeed);
+	}
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
 
+	@Override
+	protected void onResume() {
+		//Initialization all the application initialization codes
+		super.onResume();
+		updateStoryList();
+	}
+
+	private void updateStoryList() {
 		final Activity newsActivity = this;
 		RequestParams params = new RequestParams();
 		params.add("limit", "100");
@@ -82,7 +99,8 @@ public class NewsfeedActivity extends ActionBarActivity {
 					@Override
 					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 							Throwable arg3) {
-						ServerIO.getInstance().connectionError(NewsfeedActivity.this);
+						ServerIO.getInstance().connectionError(
+								NewsfeedActivity.this);
 					}
 
 					@Override

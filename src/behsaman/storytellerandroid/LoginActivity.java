@@ -2,7 +2,9 @@ package behsaman.storytellerandroid;
 
 import behsaman.storytellerandroid.networking.ServerIO;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -84,5 +86,37 @@ public class LoginActivity extends Activity {
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}
+	
+	@Override
+	public void onBackPressed() {
+		new AlertDialog.Builder(this)
+				.setMessage("Are you sure you want to exit?")
+				.setCancelable(false)
+				.setPositiveButton("Yes :(",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								LoginActivity.this.finish();
+								Intent intent = new Intent(Intent.ACTION_MAIN);
+								intent.addCategory(Intent.CATEGORY_HOME);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								startActivity(intent);
+							}
+						}).setNegativeButton("No :)", null).show();
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		//Initialization all the application initialization codes
+		super.onResume();
+		ServerIO.getInstance().initialize(this);
+	}
+	
+	
 
 }
