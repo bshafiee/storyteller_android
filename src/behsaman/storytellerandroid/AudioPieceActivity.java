@@ -180,9 +180,9 @@ public class AudioPieceActivity extends Activity {
 	private void startRecording() {
 		mRecorder = new MediaRecorder();
 		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		mRecorder.setOutputFile(mFileName);
-		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
 		try {
 			mRecorder.prepare();
@@ -272,7 +272,7 @@ public class AudioPieceActivity extends Activity {
 
 	public AudioPieceActivity() {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-		mFileName += "/audiorecordtest.3gp";
+		mFileName += "/audiorecordtest.mp4";
 	}
 
 	@Override
