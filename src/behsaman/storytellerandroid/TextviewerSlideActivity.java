@@ -18,9 +18,9 @@ package behsaman.storytellerandroid;
 
 import java.util.ArrayList;
 
-import behsaman.storytellerandroid.datamodel.PieceModel;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
@@ -30,6 +30,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import behsaman.storytellerandroid.datamodel.PieceModel;
+import behsaman.storytellerandroid.datamodel.StoryModel;
 
 /**
  * Demonstrates a "screen-slide" animation using a {@link ViewPager}. Because {@link ViewPager}
@@ -44,6 +46,7 @@ import android.view.MenuItem;
  */
 public class TextviewerSlideActivity extends FragmentActivity {
 
+	private static final String TAG = "TextviewerSlideActivity";
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
@@ -52,6 +55,8 @@ public class TextviewerSlideActivity extends FragmentActivity {
 
     //Story Pieces
     ArrayList<Object> pieces = new ArrayList<Object>();
+    //Story Model
+    StoryModel storyModel = null;
     
     /**
      * The pager adapter, which provides the pages to the view pager widget.
@@ -70,12 +75,13 @@ public class TextviewerSlideActivity extends FragmentActivity {
     private void setupPager() {
  		Intent intent = getIntent();
  		this.pieces = (ArrayList<Object>) intent.getSerializableExtra(StoryPageActivity.STORY_PIECES_KEY);
+ 		this.storyModel = (StoryModel) intent.getSerializableExtra(StoryPageActivity.STORY_MODEL_KEY);
  		Integer selected_page = (Integer) intent.getSerializableExtra(StoryPageActivity.STORY_SELECTED_PIECE_KEY);
  		
  		// Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager(),this.pieces);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager(),this.pieces,storyModel,this);
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -154,15 +160,19 @@ public class TextviewerSlideActivity extends FragmentActivity {
      */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
     	protected ArrayList<Object> data;
+    	protected StoryModel model;
+    	protected Context parentContext;
     	
-        public ScreenSlidePagerAdapter(FragmentManager fm,ArrayList<Object> d) {
+        public ScreenSlidePagerAdapter(FragmentManager fm,ArrayList<Object> d, StoryModel storyModel,Context c) {
         	super(fm);
         	this.data = d;
+        	this.model = storyModel;
+        	this.parentContext = c;
         }
 
         @Override
         public Fragment getItem(int position) {
-            return ScreenSlidePageFragment.create((PieceModel)data.get(position));
+            return ScreenSlidePageFragment.create((PieceModel)data.get(position),model.getType(),parentContext);
         }
 
         @Override

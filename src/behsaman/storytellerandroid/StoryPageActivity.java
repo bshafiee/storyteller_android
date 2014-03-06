@@ -169,7 +169,7 @@ public class StoryPageActivity extends Activity {
 										.has("video_file_addr") ? obj
 										.getString("video_file_addr") : null;
 								String picture_file_addr = obj
-										.has("picture_file_add") ? obj
+										.has("picture_file_addr") ? obj
 										.getString("picture_file_addr") : null;
 								int creator_id = obj.getInt("creator_id");
 								Date date = Utils.parseDate(
@@ -195,6 +195,8 @@ public class StoryPageActivity extends Activity {
 							updateTextStoryPieces(pieces);
 						else if (model.getType() == STORY_TYPE.AUDIO)
 							updateAudioStoryPieces(pieces);
+						else if (model.getType() == STORY_TYPE.COMICS)
+							updateTextStoryPieces(pieces);
 						else
 							Log.e(TAG,"WHAT THE FFUCKKKKK ?"+model.getType());
 					}
@@ -240,6 +242,7 @@ public class StoryPageActivity extends Activity {
 				Intent intent = new Intent(curContext,
 						TextviewerSlideActivity.class);
 				intent.putExtra(STORY_PIECES_KEY, curPieces);
+				intent.putExtra(STORY_MODEL_KEY, model);
 				intent.putExtra(STORY_SELECTED_PIECE_KEY, position);
 				startActivity(intent);
 			}
@@ -375,6 +378,8 @@ public class StoryPageActivity extends Activity {
 
 	private void goToContribetePage() {
 		if (model.getType() == STORY_TYPE.TEXT_ONLY)
+			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
+		else if(model.getType() == STORY_TYPE.COMICS)
 			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
 		else if (model.getType() == STORY_TYPE.AUDIO)
 			changeViewToNewPiece(model, generatedUUID, AudioPieceActivity.class);
@@ -564,6 +569,7 @@ public class StoryPageActivity extends Activity {
 		case TEXT_ONLY:
 			intent = new Intent(this, TextviewerSlideActivity.class);
 			intent.putExtra(STORY_PIECES_KEY, pieces);
+			intent.putExtra(STORY_MODEL_KEY, model);
 			startActivity(intent);
 			break;
 		case AUDIO:
