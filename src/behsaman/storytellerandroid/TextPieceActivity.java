@@ -165,11 +165,12 @@ public class TextPieceActivity extends Activity {
 			params.add("piece_index", model.getNext_available_piece()
 					.toString());
 			params.add("text_value", text_value);
-			if(model.getType() == STORY_TYPE.COMICS) {
+			if (model.getType() == STORY_TYPE.COMICS) {
 				File myFile = new File(bitmapFile);
 				try {
-				    params.put("picture_file_value", myFile);
-				} catch(FileNotFoundException e) {}
+					params.put("picture_file_value", myFile);
+				} catch (FileNotFoundException e) {
+				}
 			}
 			ServerIO.getInstance().post(ServerIO.INSERT_STORY_PIECE_URL,
 					params, new JsonHttpResponseHandler() {
@@ -209,7 +210,7 @@ public class TextPieceActivity extends Activity {
 		comicbutton.setLayoutParams(params);
 		LinearLayout layout_text_piece = (LinearLayout) findViewById(R.id.layout_text_piece);
 		layout_text_piece.addView(comicbutton);
-		
+
 		comicbutton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -217,58 +218,60 @@ public class TextPieceActivity extends Activity {
 			}
 		});
 	}
-	
+
 	private static final int REQUEST_CODE = 1;
-    private Bitmap comicBitmap;
-    private String bitmapFile = null;
+	private Bitmap comicBitmap;
+	private String bitmapFile = null;
+
 	public void pickImage(View view) {
 		Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, REQUEST_CODE);
-		
+		intent.setType("image/*");
+		intent.setAction(Intent.ACTION_GET_CONTENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		startActivityForResult(intent, REQUEST_CODE);
+
 	}
-	
-	public String getImagePath(Uri uri){
-		   Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-		   cursor.moveToFirst();
-		   String document_id = cursor.getString(0);
-		   document_id = document_id.substring(document_id.lastIndexOf(":")+1);
-		   cursor.close();
 
-		   cursor = getContentResolver().query( 
-		   android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-		   null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-		   cursor.moveToFirst();
-		   String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-		   cursor.close();
+	public String getImagePath(Uri uri) {
+		Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+		cursor.moveToFirst();
+		String document_id = cursor.getString(0);
+		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+		cursor.close();
 
-		   return path;
-		}
-	
-	
+		cursor = getContentResolver().query(
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ",
+				new String[] { document_id }, null);
+		cursor.moveToFirst();
+		String path = cursor.getString(cursor
+				.getColumnIndex(MediaStore.Images.Media.DATA));
+		cursor.close();
+
+		return path;
+	}
+
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK)
-            try {
-                // We need to recyle unused bitmaps
-                if (comicBitmap != null) {
-                    comicBitmap.recycle();
-                }
-                InputStream stream = getContentResolver().openInputStream(
-                        data.getData());
-                bitmapFile = getImagePath(data.getData());
-                comicBitmap = BitmapFactory.decodeStream(stream);
-                stream.close();
-                comicbutton.setImageBitmap(comicBitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK)
+			try {
+				// We need to recyle unused bitmaps
+				if (comicBitmap != null) {
+					comicBitmap.recycle();
+				}
+				InputStream stream = getContentResolver().openInputStream(
+						data.getData());
+				bitmapFile = getImagePath(data.getData());
+				comicBitmap = BitmapFactory.decodeStream(stream);
+				stream.close();
+				comicbutton.setImageBitmap(comicBitmap);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 
 	private void changeViewToStoryPage(int story_id) {
 		Intent intent = new Intent(this, StoryPageActivity.class);

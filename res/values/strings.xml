@@ -20,5 +20,6 @@
     <string name="title_activity_audio_piece">AudioPieceActivity</string>
     <string name="title_activity_textviewer">TextviewerActivity</string>
     <string name="title_activity_audiostory_player">AudiostoryPlayerActivity</string>
+    <string name="title_activity_video_piece">VideoPieceActivity</string>
 
 </resources>

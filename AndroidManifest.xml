@@ -71,6 +71,15 @@
             android:name="behsaman.storytellerandroid.AudiostoryPlayerActivity"
             android:label="@string/title_activity_audiostory_player" >
         </activity>
+        <activity
+            android:name="behsaman.storytellerandroid.videoplayer.VideoPlayerActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="behsaman.storytellerandroid.VideoPieceActivity"
+            android:label="@string/title_activity_video_piece" >
+        </activity>
     </application>
 
 </manifest>

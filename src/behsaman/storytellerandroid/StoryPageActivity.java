@@ -197,6 +197,8 @@ public class StoryPageActivity extends Activity {
 							updateAudioStoryPieces(pieces);
 						else if (model.getType() == STORY_TYPE.COMICS)
 							updateTextStoryPieces(pieces);
+						else if (model.getType() == STORY_TYPE.VIDEO)
+							updateVideoStoryPieces(pieces);
 						else
 							Log.e(TAG,"WHAT THE FFUCKKKKK ?"+model.getType());
 					}
@@ -248,7 +250,34 @@ public class StoryPageActivity extends Activity {
 			}
 		});
 	}
+	
+	private void updateVideoStoryPieces(ArrayList<Object> pieces) {
+		final Activity storyPageActivity = this;
+		// Add to UI
+		ListView list = (ListView) findViewById(R.id.list_story_page_pieces);
+		// Getting adapter by passing xml data ArrayList
+		LazyAdapterTextPieces adapter = new LazyAdapterTextPieces(
+				storyPageActivity, (ArrayList<Object>) pieces);
+		list.setAdapter(adapter);
 
+		final Context curContext = this;
+		final ArrayList<Object> curPieces = pieces;
+		// Click event for single list row
+		list.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// Go to Show View
+				Intent intent = new Intent(curContext,
+						TextviewerSlideActivity.class);
+				intent.putExtra(STORY_PIECES_KEY, curPieces);
+				intent.putExtra(STORY_MODEL_KEY, model);
+				intent.putExtra(STORY_SELECTED_PIECE_KEY, position);
+				startActivity(intent);
+			}
+		});
+	}
+	
 	private void updateView() {
 		// Invalid id
 		if (model == null)
@@ -383,6 +412,8 @@ public class StoryPageActivity extends Activity {
 			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
 		else if (model.getType() == STORY_TYPE.AUDIO)
 			changeViewToNewPiece(model, generatedUUID, AudioPieceActivity.class);
+		else if (model.getType() == STORY_TYPE.VIDEO)
+			changeViewToNewPiece(model, generatedUUID, VideoPieceActivity.class);
 	}
 
 	private void sendContributeRequest() {
