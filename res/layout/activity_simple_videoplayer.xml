@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/fragment_videoplayer"
-        android:name="com.stickmanventures.android.example.immersive_videoplayer.ui.fragments.VideoPlayerFragment"
+        android:name="behsaman.storytellerandroid.videoplayer.VideoPlayerFragment"
         android:layout_height="0dp"
         android:layout_width="match_parent"
         android:layout_weight="1" />

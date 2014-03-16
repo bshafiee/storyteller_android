@@ -33,6 +33,10 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import behsaman.storytellerandroid.datamodel.LOCK_TIME_MINS;
+import behsaman.storytellerandroid.datamodel.MAX_MULTIMEDIA_PIECE_LENGTH_TYPE;
+import behsaman.storytellerandroid.datamodel.MAX_NUM_PIECES_TYPE;
+import behsaman.storytellerandroid.datamodel.MAX_TEXT_PIECE_LENGTH_TYPE;
 import behsaman.storytellerandroid.datamodel.PieceModel;
 import behsaman.storytellerandroid.datamodel.STORY_TYPE;
 import behsaman.storytellerandroid.datamodel.StoryModel;
@@ -70,13 +74,88 @@ public class StoryPageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_story_page);
 
-		// Get Story 
+		// Get Story
 		Intent intent = getIntent();
-		this.model = (StoryModel) intent.getSerializableExtra(NewsfeedActivity.STORY_MODEL_KEY);
+		this.model = (StoryModel) intent
+				.getSerializableExtra(NewsfeedActivity.STORY_MODEL_KEY);
+		/**
+		 * Update the model Immediately it might be the case that a new piece
+		 * has been added to this story so wee need to refresh data from Server
+		 * This caused a bug where after sending a piece we could not send
+		 * immediately another piece
+		 */
+		this.updateModelFromServer();
 
 		this.updateView();
 		this.updateContirbuteionStatus();
 		this.updatePieces();
+	}
+
+	private void updateModelFromServer() {
+		RequestParams params = new RequestParams();
+		params.add("id", model.getId().toString());
+		ServerIO.getInstance().post(ServerIO.GET_STORY_BY_ID_URL, params,
+				new JsonHttpResponseHandler() {
+					@Override
+					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+							Throwable arg3) {
+						ServerIO.getInstance().connectionError(
+								StoryPageActivity.this);
+					}
+
+					@Override
+					public synchronized void onSuccess(JSONObject result) {
+						try {
+							if (result.getInt("Status") != ServerIO.SUCCESS) {
+								Log.e(TAG, result.getString("Error"));
+								return;
+							}
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
+						}
+
+						JSONObject obj = null;
+						try {
+							obj = result.getJSONObject("data");
+						} catch (JSONException e1) {
+							Log.e(TAG, e1.getMessage());
+						}
+						
+						try {
+							int id = obj.getInt("id");
+							int owner_id = obj.getInt("owner_id");
+							Integer category_id = obj.getInt("category_id");
+							String title = obj.getString("title");
+							STORY_TYPE type = STORY_TYPE.valueOf(obj
+									.getString("type"));
+							MAX_NUM_PIECES_TYPE max_num_pieces = MAX_NUM_PIECES_TYPE
+									.valueOf(obj.getString("max_num_pieces"));
+							MAX_MULTIMEDIA_PIECE_LENGTH_TYPE max_multimedia_piece_length = MAX_MULTIMEDIA_PIECE_LENGTH_TYPE.valueOf(obj
+									.getString("max_multimedia_piece_length"));
+							MAX_TEXT_PIECE_LENGTH_TYPE max_text_piece_length = MAX_TEXT_PIECE_LENGTH_TYPE.valueOf(obj
+									.getString("max_text_piece_length"));
+							LOCK_TIME_MINS lock_time_mins = LOCK_TIME_MINS
+									.valueOf(obj.getString("lock_time_mins"));
+							int next_available_piece = obj
+									.getInt("next_available_piece");
+							Date created_on = Utils.parseDate(
+									StoryModel.DATE_FORMAT,
+									obj.getString("created_on"));
+
+							model = new StoryModel(id,
+									owner_id, category_id.toString(), title,
+									type, max_num_pieces,
+									max_multimedia_piece_length,
+									max_text_piece_length, lock_time_mins,
+									next_available_piece, created_on);
+
+						} catch (JSONException e) {
+							Log.e(TAG,
+									"Error in getting JSONObject: "
+											+ e.getMessage());
+						}
+					}
+				});
 	}
 
 	private void updatePieces() {
@@ -94,13 +173,15 @@ public class StoryPageActivity extends Activity {
 					@Override
 					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 							Throwable arg3) {
-						ServerIO.getInstance().connectionError(StoryPageActivity.this);
+						ServerIO.getInstance().connectionError(
+								StoryPageActivity.this);
 					}
-					
+
 					@Override
 					public void onFailure(int statusCode, Header[] headers,
 							String responseBody, Throwable e) {
-							ServerIO.getInstance().connectionError(StoryPageActivity.this);
+						ServerIO.getInstance().connectionError(
+								StoryPageActivity.this);
 					}
 
 					@Override
@@ -147,7 +228,6 @@ public class StoryPageActivity extends Activity {
 						} catch (JSONException e1) {
 							Log.e(TAG, e1.getMessage());
 						}
-						
 
 						JSONArray arr = null;
 						try {
@@ -176,10 +256,10 @@ public class StoryPageActivity extends Activity {
 								Date date = Utils.parseDate(
 										StoryModel.DATE_FORMAT,
 										obj.getString("created_on"));
-								PieceModel p = new PieceModel(id, model.getId(),
-										creator_id, index, text_val, audio_val,
-										video_file_addr, picture_file_addr,
-										date);
+								PieceModel p = new PieceModel(id,
+										model.getId(), creator_id, index,
+										text_val, audio_val, video_file_addr,
+										picture_file_addr, date);
 								pieces.add(p);
 							} catch (JSONException e) {
 								Log.e(TAG,
@@ -190,7 +270,7 @@ public class StoryPageActivity extends Activity {
 							}
 
 						}
-						
+
 						// Story Specific Update
 						if (model.getType() == STORY_TYPE.TEXT_ONLY)
 							updateTextStoryPieces(pieces);
@@ -201,7 +281,7 @@ public class StoryPageActivity extends Activity {
 						else if (model.getType() == STORY_TYPE.VIDEO)
 							updateVideoStoryPieces(pieces);
 						else
-							Log.e(TAG,"WHAT THE FFUCKKKKK ?"+model.getType());
+							Log.e(TAG, "WHAT THE FFUCKKKKK ?" + model.getType());
 					}
 				});
 
@@ -251,7 +331,7 @@ public class StoryPageActivity extends Activity {
 			}
 		});
 	}
-	
+
 	private void updateVideoStoryPieces(ArrayList<Object> pieces) {
 		final Activity storyPageActivity = this;
 		// Add to UI
@@ -269,7 +349,8 @@ public class StoryPageActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// Go to Show View
-				Intent intent = new Intent(curContext,VideoPlayerActivity.class);
+				Intent intent = new Intent(curContext,
+						VideoPlayerActivity.class);
 				intent.putExtra(STORY_PIECES_KEY, curPieces);
 				intent.putExtra(STORY_MODEL_KEY, model);
 				intent.putExtra(STORY_SELECTED_PIECE_KEY, position);
@@ -277,7 +358,7 @@ public class StoryPageActivity extends Activity {
 			}
 		});
 	}
-	
+
 	private void updateView() {
 		// Invalid id
 		if (model == null)
@@ -289,7 +370,8 @@ public class StoryPageActivity extends Activity {
 		String description = "Category: " + model.getCategory();
 		description += "\nCreated By: " + model.getOwner_id();
 		description += "\nPieces Left: "
-				+ (model.getMax_num_pieces().getNumVal() - model.getNext_available_piece());
+				+ (model.getMax_num_pieces().getNumVal() - model
+						.getNext_available_piece());
 		description += "\nStory Type: " + (model.getType().toString());
 		TextView infoBox = (TextView) findViewById(R.id.tv_story_page_info);
 		infoBox.setText(description);
@@ -311,6 +393,7 @@ public class StoryPageActivity extends Activity {
 			break;
 		}
 	}
+
 	private void updateContirbuteionStatus() {
 		// Invalid id
 		if (model == null)
@@ -329,9 +412,10 @@ public class StoryPageActivity extends Activity {
 					@Override
 					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 							Throwable arg3) {
-						ServerIO.getInstance().connectionError(StoryPageActivity.this);
+						ServerIO.getInstance().connectionError(
+								StoryPageActivity.this);
 					}
-			
+
 					@Override
 					public synchronized void onSuccess(JSONObject result) {
 						try {
@@ -406,7 +490,7 @@ public class StoryPageActivity extends Activity {
 	private void goToContribetePage() {
 		if (model.getType() == STORY_TYPE.TEXT_ONLY)
 			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
-		else if(model.getType() == STORY_TYPE.COMICS)
+		else if (model.getType() == STORY_TYPE.COMICS)
 			changeViewToNewPiece(model, generatedUUID, TextPieceActivity.class);
 		else if (model.getType() == STORY_TYPE.AUDIO)
 			changeViewToNewPiece(model, generatedUUID, AudioPieceActivity.class);
@@ -423,9 +507,10 @@ public class StoryPageActivity extends Activity {
 					@Override
 					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 							Throwable arg3) {
-						ServerIO.getInstance().connectionError(StoryPageActivity.this);
+						ServerIO.getInstance().connectionError(
+								StoryPageActivity.this);
 					}
-			
+
 					@Override
 					public synchronized void onSuccess(JSONObject result) {
 						try {

@@ -238,7 +238,8 @@ public class VideoPlayerActivity extends BaseActivity {
 		Video video = new Video(address);
 		video.setTitle(model.getTitle());
 		video.setAuthor(model.getOwner_id().toString());
-		video.setDescription("Piece " + model.getNext_available_piece());
+		video.setDescription("Piece " + piece.getIndex());
+
 		return video;
 	}
 

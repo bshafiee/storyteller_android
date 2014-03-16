@@ -162,7 +162,7 @@ public class VideoPieceActivity extends Activity {
 				video.setDescription("Piece " + model.getNext_available_piece());
 
 				// Launch the activity with some extras
-				intent.putExtra(VideoPlayerActivity.EXTRA_LAYOUT, "1");
+				intent.putExtra(VideoPlayerActivity.EXTRA_LAYOUT, "0");
 				intent.putExtra(Video.class.getName(), video);
 				startActivity(intent);
 			}

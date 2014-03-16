@@ -14,16 +14,13 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import behsaman.storytellerandroid.R;
-import behsaman.storytellerandroid.R.drawable;
-
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
+import behsaman.storytellerandroid.R;
 
 public class ImageLoader {
     
