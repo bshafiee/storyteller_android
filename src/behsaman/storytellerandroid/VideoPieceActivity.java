@@ -43,10 +43,11 @@ public class VideoPieceActivity extends Activity {
 	private Button sendButton;
 	private String mFileName = null;
 	private ProgressDialog progressDialog = null;
-	private boolean isSending = false;
+	private boolean isSending;
 	private int progress = 0;
 
-	private final static String IS_SENDING = "VIDEOPIECEACTIVITY_CURRENT_PROGRESS";
+	private final static String IS_SENDING = "VIDEOPIECEACTIVITY_IS_SENDING";
+	private final static String PROGRESS_VALUE = "VIDEOPIECEACTIVITY_CURRENT_PROGRESS";
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -56,28 +57,37 @@ public class VideoPieceActivity extends Activity {
 	}
 	
 	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		
-		if(savedInstanceState==null)
-			return;
-		if(savedInstanceState.getBoolean(IS_SENDING))
-			showProgressDialog(progress);
-	}
-
-	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		
-		Log.e(TAG,"IsSending?"+(isSending?"YES":"NO"));
 		outState.putBoolean(IS_SENDING, isSending);
-		cancelProgresDialog();
+		outState.putInt(PROGRESS_VALUE, progress);
+		progressDialog.dismiss();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_video_piece);
+		
+		//Progressbar
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setMessage("Uploading Video... :) ");
+		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		progressDialog.setIndeterminate(false);
+		progressDialog.setProgress(progress);
+		progressDialog.setMax(100);
+		
+		if(savedInstanceState!=null)
+		{
+			if(savedInstanceState.getBoolean(IS_SENDING))
+			{
+				Log.e(TAG,"Progress?"+savedInstanceState.getInt(PROGRESS_VALUE));
+				if(!progressDialog.isShowing())
+					progressDialog.show();
+				updateProgresDialog(progress);
+			}
+		}
 		
 		LinearLayout ll = new LinearLayout(this);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -132,7 +142,7 @@ public class VideoPieceActivity extends Activity {
 		selectButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				pickImage(v);
+				pickVideo(v);
 			}
 		});
 
@@ -158,32 +168,19 @@ public class VideoPieceActivity extends Activity {
 			}
 		});
 	}
-
-	private synchronized void showProgressDialog(int prog) {
-		cancelProgresDialog();
-		isSending = true;
-		
-		if(progressDialog == null)
-			progressDialog = new ProgressDialog(this);
-		progressDialog.setMessage("Uploading Video... :) ");
-		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		progressDialog.setIndeterminate(false);
-		progressDialog.setProgress(prog);
-		progressDialog.setMax(100);
-		progressDialog.show();
-	}
 	
-	private synchronized void cancelProgresDialog() {
-		isSending = false;
-		if(progressDialog!=null)
-			progressDialog.dismiss();
-		progressDialog = null;
+	private void showProgressDialog() {
+		isSending = true;
+		if(!progressDialog.isShowing())
+			progressDialog.show();
 	}
 	
 	private void updateProgresDialog(int prog) {
+		if(!progressDialog.isShowing())
+			return;
 		progressDialog.setProgress(prog);
 		progressDialog.setMessage(new Integer(prog).toString());
-		Log.e(TAG,"-Progress:"+new Integer(prog).toString());
+		//Log.e(TAG,"-Progress:"+new Integer(prog).toString());
 	}
 	
 	private void sendPiece() {
@@ -202,8 +199,8 @@ public class VideoPieceActivity extends Activity {
 		params.add("story_id", model.getId().toString());
 		params.add("uuid", uuid.toString());
 		params.add("piece_index", model.getNext_available_piece().toString());
-		//Show Progress Bar
-		showProgressDialog(0);
+		//Show dialog
+		showProgressDialog();
 		ServerIO.getInstance().post(ServerIO.INSERT_STORY_PIECE_URL, params,
 				new JsonHttpResponseHandler() {
 					
@@ -215,7 +212,7 @@ public class VideoPieceActivity extends Activity {
 
 					@Override
 					public synchronized void onSuccess(JSONObject result) {
-						cancelProgresDialog();
+						progressDialog.dismiss();
 						// Delete file
 						File temp = new File(mFileName);
 						temp.delete();
@@ -245,7 +242,7 @@ public class VideoPieceActivity extends Activity {
 
 	private static final int REQUEST_CODE = 1;
 
-	public void pickImage(View view) {
+	public void pickVideo(View view) {
 		Intent intent = new Intent();
 		intent.setType("video/*");
 		intent.setAction(Intent.ACTION_GET_CONTENT);

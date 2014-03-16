@@ -39,6 +39,7 @@ import behsaman.storytellerandroid.datamodel.StoryModel;
 import behsaman.storytellerandroid.networking.MyBinaryHttpResponseHandler;
 import behsaman.storytellerandroid.networking.ServerIO;
 import behsaman.storytellerandroid.utils.Utils;
+import behsaman.storytellerandroid.videoplayer.VideoPlayerActivity;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -268,8 +269,7 @@ public class StoryPageActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// Go to Show View
-				Intent intent = new Intent(curContext,
-						TextviewerSlideActivity.class);
+				Intent intent = new Intent(curContext,VideoPlayerActivity.class);
 				intent.putExtra(STORY_PIECES_KEY, curPieces);
 				intent.putExtra(STORY_MODEL_KEY, model);
 				intent.putExtra(STORY_SELECTED_PIECE_KEY, position);
@@ -358,8 +358,6 @@ public class StoryPageActivity extends Activity {
 							Long leftMins = new Date().getTime() - request_date;
 							leftMins /= 1000;// second
 							leftMins /= 60;// Mins
-							Log.e(TAG, "Curr:" + new Date().getTime()
-									+ "\tReqDate:" + request_date);
 							generatedUUID = UUID.fromString(obj
 									.getString("generatedUUID"));
 
@@ -606,6 +604,13 @@ public class StoryPageActivity extends Activity {
 		case AUDIO:
 			intent = new Intent(this, AudiostoryPlayerActivity.class);
 			intent.putExtra(STORY_PIECES_KEY, pieces);
+			startActivity(intent);
+			break;
+		case VIDEO:
+			intent = new Intent(this, VideoPlayerActivity.class);
+			intent.putExtra(STORY_PIECES_KEY, pieces);
+			intent.putExtra(STORY_MODEL_KEY, model);
+			intent.putExtra(VideoPlayerActivity.EXTRA_LAYOUT, "1");
 			startActivity(intent);
 			break;
 

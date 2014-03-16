@@ -30,6 +30,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 public class ServerIO {
 	private static final String TAG = "ServerIO";
 	//URLs
+	public static final String BASIC_HTTP_AUTH_PATTERN = "https://%s:%s@www.noveldevelopments.com:8443/";
 	public static final String BASE_URL = "https://www.noveldevelopments.com:8443/";
 	public static final String LOGIN_URL = "login.jsp";
 	public static final String LOGOUT_URL = "logout";
@@ -52,6 +53,10 @@ public class ServerIO {
 	//JSON RESULTS
 	public static final Integer SUCCESS = 200;
 	public static final Integer FAILURE = 0;
+	
+	//Credential Info for BASIC HTTP AUTHENTICATION
+	private String username = null;
+	private String password = null; 
 	
 	private ServerIO () {}
 	
@@ -94,7 +99,7 @@ public class ServerIO {
 		return client.post(BASE_URL+relativeURL, params, responseHandler);
 	}
 	
-	public void login(String user, String pass)
+	public void login(final String user,final String pass)
 	{
 		if(client == null)
 		{
@@ -112,7 +117,11 @@ public class ServerIO {
 				try {
 					int status = obj.getInt("Status");
 					if(status == SUCCESS)
+					{
 						logged_in = true;
+						username = user;
+						password = pass;
+					}
 					else
 						logged_in = false;
 				} catch (Exception e) {
@@ -214,5 +223,17 @@ public class ServerIO {
 				c.startActivity(intent);
 			}
 		});
+	}
+
+	public String getBasicAuthURL(String video_file_addr) {
+		if(username == null || password == null) {
+			Log.e(TAG, "You are not authenticated!! BasicHTTPAUTH is not possible.");
+			return null;
+		}
+		
+		String removedURL = video_file_addr.replace(BASE_URL, "");
+		String newBaseURL = String.format(BASIC_HTTP_AUTH_PATTERN, username,password);
+		
+		return newBaseURL+removedURL;
 	}
 }
