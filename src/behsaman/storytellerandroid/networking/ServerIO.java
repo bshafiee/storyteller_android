@@ -30,8 +30,8 @@ import com.loopj.android.http.TextHttpResponseHandler;
 public class ServerIO {
 	private static final String TAG = "ServerIO";
 	//URLs
-	public static final String BASIC_HTTP_AUTH_PATTERN = "https://%s:%s@www.noveldevelopments.com:8443/";
-	public static final String BASE_URL = "https://www.noveldevelopments.com:8443/";
+	public static final String BASIC_HTTP_AUTH_PATTERN = "https://%s:%s@behrooz.no-ip.biz:8443/";
+	public static final String BASE_URL = "https://behrooz.no-ip.biz:8443/";
 	public static final String LOGIN_URL = "login.jsp";
 	public static final String LOGOUT_URL = "logout";
 	public static final String CHECK_LOGIN_URL = "SuccessfulLogin";

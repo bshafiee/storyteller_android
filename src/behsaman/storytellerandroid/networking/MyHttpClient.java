@@ -27,7 +27,7 @@ public class MyHttpClient extends DefaultHttpClient {
     SchemeRegistry registry = new SchemeRegistry();
     registry.register(
         new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-    registry.register(new Scheme("https", newSslSocketFactory(), 443));
+    registry.register(new Scheme("https", newSslSocketFactory(), 8443));
     return new SingleClientConnManager(getParams(), registry);
   }
 
